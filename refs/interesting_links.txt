@@ -1,0 +1,16 @@
+
+# Image Data Pre-Processing for Neural Networks
+- By: Balbina
+https://becominghuman.ai/image-data-pre-processing-for-neural-networks-498289068258
+
+# Deep Learning (Machine Learning) applied to Tinder
+- By: Laura
+http://philipperemy.github.io/tinder-deep-learning/
+
+# Labeled faces in the wild [DATASET]
+- By: Balbi
+http://vis-www.cs.umass.edu/lfw/
+
+# Unfiltered faces for gender and age classification [DATASET]
+- By: Carles
+https://www.openu.ac.il/home/hassner/Adience/data.html
