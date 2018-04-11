@@ -14,3 +14,7 @@ http://vis-www.cs.umass.edu/lfw/
 # Unfiltered faces for gender and age classification [DATASET]
 - By: Carles
 https://www.openu.ac.il/home/hassner/Adience/data.html
+
+#  Self Taught Learning
+- By: Laura
+http://ufldl.stanford.edu/tutorial/selftaughtlearning/SelfTaughtLearning/
