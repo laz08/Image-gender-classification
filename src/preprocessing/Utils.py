@@ -24,6 +24,8 @@ def readLineAsArray(filein):
         for line in ins:
             array.append(line)
 
+    return array
+
 def appendLineToFile(fileout, line):
     with open(fileout, "a") as f:
         f.write(line + "\n")

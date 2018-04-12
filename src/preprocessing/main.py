@@ -5,8 +5,8 @@ import sys, getopt
 import Utils as utils
 import os
 
-_FEMALE_NAMES_PATH =  "../../datasets/faces_in_the_wild/"
-_FEMALE_NAMES_FILE =  "female_names.txt"
+_FEMALE_NAMES_PATH =  "../../datasets/faces_in_the_wild/female_names.txt"
+#_FEMALE_NAMES_FILE =  "female_names.txt"
 
 _FEMALE_NAMES_PATH1 =  "../../datasets/faces_in_the_wild/female_names.txt"
 _MALE_NAMES_PATH =  "../../datasets/faces_in_the_wild/male_names.txt"
@@ -16,8 +16,9 @@ _PHOTOS_DIR = "../../datasets/faces_in_the_wild/lfw-deepfunneled/"
 _MALE_LABELS = "malePaths.txt"
 _FEMALE_LABELS = "femalePaths.txt"
 
-def changeToRelativePath(relativePath):
-    os.chdir(os.path.normpath(os.path.join(os.getcwd(), relativePath)))
+def getRelativePath(relativePath):
+    #os.chdir(os.path.normpath(os.path.join(os.getcwd(), relativePath)))
+    return os.path.normpath(os.path.join(os.getcwd(), relativePath))
 
 def extractNames(rawLabels):
     cleanLabels = []
@@ -27,13 +28,13 @@ def extractNames(rawLabels):
 
     return cleanLabels
 
-def getPathsToFile(name):
+def getPathsToFile(name, parentPath):
     
     paths = []
-    dirs = [d for d in os.listdir(os.getcwd())]
+    dirs = [d for d in os.listdir(parentPath)]
     for d in dirs:
         if(d == name):
-            destdir = os.getcwd() + d
+            destdir = parentPath + d
             files = [f for f in os.listdir(destdir) if os.path.isfile(os.path.join(destdir, f))]
             for f in files:
                 paths.append(destdir + "/" + f)
@@ -45,31 +46,39 @@ def getPathsToFile(name):
 # isMale = True if male, false otherwise.
 def createLabels(setOfNames, isMale):
 
+    photosDir = getRelativePath(_PHOTOS_DIR)
     if(isMale):
         LABELS = _MALE_LABELS
     else:
         LABELS = _FEMALE_LABELS
 
+    paths = []
     for name in setOfNames:
-        pathsToFile = getPathsToFile(name)
-        for p in pathsToFile:
-            utils.appendLineToFile(LABELS, p)
+        pathsToFile = getPathsToFile(name, photosDir)
+        paths.append(pathsToFile)
+        #for p in pathsToFile:
+        #    utils.appendLineToFile(LABELS, p)
+        print(paths[0])
+        break
 
 
 def main():
 
-    changeToRelativePath(_FEMALE_NAMES_PATH)
+    path = getRelativePath(_FEMALE_NAMES_PATH)
 
-    femaleNames = utils.readLineAsArray(_FEMALE_NAMES_FILE)
+    femaleNames = utils.readLineAsArray(path)
     #maleNames = utils.readLineAsArray(_MALE_NAMES_PATH)
 
+    print(femaleNames[0])
     if(False):
         utils.writeToFile(_MALE_LABELS, "")
         utils.writeToFile(_FEMALE_LABELS, "")
 
-    changeToRelativePath(_PHOTOS_DIR)
+    #print(os.getcwd())
+    photosPath = getRelativePath(_PHOTOS_DIR)
 
     femaleNames = extractNames(femaleNames)
+    
     #maleNames = extractNames(maleNames)
 
     createLabels(femaleNames, False)
