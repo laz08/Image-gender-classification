@@ -18,6 +18,7 @@ def readFromFile(filein):
     return contents
 
 def readLineAsArray(filein):
+    print(filein)
     array = []
     with open(filein, "r") as ins:
         for line in ins:
