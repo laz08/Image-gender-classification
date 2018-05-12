@@ -36,7 +36,7 @@ a_array = ["MALE", "FEMALE"]
 input_file = open('datasets/predict_labels.txt')
 
 for i, line in enumerate(input_file):
-
+        print('datasets/' + str(line))
         chal_img = cv2.imread('datasets/' + str(line))
         resized_image = cv2.resize(chal_img, (WIDTH, HEIGHT)).astype(np.float32)
         resized_image = np.expand_dims(resized_image, axis=0)
