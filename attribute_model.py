@@ -117,29 +117,23 @@ def load_csv(filename):
     return dataset
 
 
-def main():
+lfw_attributes = load_csv('datasets/lfw_attributes.txt')
+(train_datas, train_labels, test_datas, test_labels) = load_images('datasets', lfw_attributes, 0.8)
+model = get_cnn_net()
+print(model)
+model.fit(train_datas, train_labels, epochs=32, batch_size=32, verbose=1, callbacks=[tensorboard])
+predict_labels = model.predict(test_datas, batch_size=32)
+test_size = len(test_labels)
+y1 = test_labels[:, 0, :].argmax(1) == predict_labels[:, 0, :].argmax(1)
+acc = (y1).sum() * 1.0
 
-    lfw_attributes = load_csv('datasets/lfw_attributes.txt')
-    (train_datas, train_labels, test_datas, test_labels) = load_images('datasets', lfw_attributes, 0.8)
-    model = get_cnn_net()
-    print(model)
-    model.fit(train_datas, train_labels, epochs=32, batch_size=32, verbose=1, callbacks=[tensorboard])
-    predict_labels = model.predict(test_datas, batch_size=32)
-    test_size = len(test_labels)
-    y1 = test_labels[:, 0, :].argmax(1) == predict_labels[:, 0, :].argmax(1)
-    acc = (y1).sum() * 1.0
+print('\nmodel evaluate:\nacc:', acc / test_size)
+print('y1', (y1.sum()) * 1.0 / test_size)
 
-    print('\nmodel evaluate:\nacc:', acc / test_size)
-    print('y1', (y1.sum()) * 1.0 / test_size)
+# Save model and weights for trained model
+model.save_weights('captcha6_20k_orig_model.h5')
+with open('captcha6_20k_orig_model.json', 'w') as f:
+    f.write(model.to_json())
 
-    # Save model and weights for trained model
-    model.save_weights('captcha6_20k_orig_model.h5')
-    with open('captcha6_20k_orig_model.json', 'w') as f:
-        f.write(model.to_json())
-
-    K.clear_session()
-    del sess
-
-
-if __name__ == "__main__":
-   main()
+K.clear_session()
+del sess
