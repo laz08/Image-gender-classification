@@ -41,5 +41,5 @@ for i, line in enumerate(input_file):
         resized_image = np.expand_dims(resized_image, axis=0)
         out = loaded_model.predict(resized_image)
         best_guess = np.argmax(out)
-        print(best_guess, i)
+        print(a_array(best_guess), i)
 input_file.close()
