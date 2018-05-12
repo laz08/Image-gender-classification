@@ -17,14 +17,14 @@ seed = 7
 np.random.seed(seed)
 
 # load json and create model
-json_file = open('captcha6_20k_model.json', 'r')
+json_file = open('captcha6_20k_orig_model.json', 'r')
 loaded_model_json = json_file.read()
 json_file.close()
 loaded_model = model_from_json(loaded_model_json)
 
 
 # load weights into new model
-loaded_model.load_weights("captcha6_20k_model.h5")
+loaded_model.load_weights("captcha6_20k_orig_model.h5")
 print("Loaded model from disk")
 
 
@@ -33,10 +33,10 @@ print("Loaded model from disk")
 # we have x-number images to predict values for
 a_array = ["MALE", "FEMALE"]
 
-input_file = open('dataset/predict_labels.txt')
+input_file = open('datasets/predict_labels.txt')
 
-for i,line in enumerate(input_file):
-        chal_img = cv2.imread('dataset/' + str(i))
+for i, line in enumerate(input_file):
+        chal_img = cv2.imread('datasets/' + str(i))
         resized_image = cv2.resize(chal_img, (WIDTH, HEIGHT)).astype(np.float32)
         resized_image = np.expand_dims(resized_image, axis=0)
         out = loaded_model.predict(resized_image)
