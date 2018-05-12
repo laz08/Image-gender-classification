@@ -22,7 +22,9 @@ def readLineAsArrayWithAppend(filein, toAppend):
     array = []
     with open(filein, "r") as ins:
         for line in ins:
-            array.append(line.replace("\n", "; " + toAppend))
+            name = line
+            if(line != "\n"):
+                array.append(line.replace("\n", "; " + toAppend))
 
     return array
 
