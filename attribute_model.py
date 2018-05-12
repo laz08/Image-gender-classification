@@ -48,7 +48,7 @@ def load_images(path, lfw_attributes, train_ratio):
     # IMAGES PER INDIVIDUAL
     for i, line in enumerate(lfw_attributes):
         name = line[0]
-        if i > 100:
+        if i > 1000:
             break;
         gender = 'MALE' if float(line[2]) > 0 else 'FEMALE'
         for image_number in range(1, line[1]):
