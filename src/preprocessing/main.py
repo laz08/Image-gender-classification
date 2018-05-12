@@ -55,16 +55,20 @@ def createLabels(setOfNames, isMale):
 
 def main():
 
+    ## Extract names with lines
     femaleNames = utils.readLineAsArray(_NAMES_PATH + _FEMALE_LABELS)
-    #maleNames = utils.readLineAsArray(_MALE_NAMES_PATH)
+    maleNames = utils.readLineAsArray(_NAMES_PATH + _MALE_LABELS)
 
     print(femaleNames[0])
     if(False):
         utils.writeToFile(_MALE_LABELS, "")
         utils.writeToFile(_FEMALE_LABELS, "")
 
+    ## Extract names without _
     femaleNames = extractNames(femaleNames)
-    #maleNames = extractNames(maleNames)
+    maleNames = extractNames(maleNames)
+    
+    print(femaleNames[0])
 
     #createLabels(femaleNames, False)
     #createLabels(maleNames, True)
