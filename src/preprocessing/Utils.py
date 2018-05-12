@@ -17,7 +17,7 @@ def readFromFile(filein):
     file.close()
     return contents
 
-def readLineAsArray(filein):
+def readLineAsArrayWithAppend(filein):
     print(filein)
     array = []
     with open(filein, "r") as ins:
