@@ -18,3 +18,13 @@ https://www.openu.ac.il/home/hassner/Adience/data.html
 #  Self Taught Learning
 - By: Laura
 http://ufldl.stanford.edu/tutorial/selftaughtlearning/SelfTaughtLearning/
+
+
+# Knn Classifier Imgs
+https://www.pyimagesearch.com/2016/08/08/k-nn-classifier-for-image-classification/
+
+#  C N N 
+https://www.pyimagesearch.com/2016/08/01/lenet-convolutional-neural-network-in-python/
+
+# SVM for binary classification
+https://es.mathworks.com/help/stats/support-vector-machines-for-binary-classification.html
