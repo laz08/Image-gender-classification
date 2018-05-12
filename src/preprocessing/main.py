@@ -5,20 +5,10 @@ import sys, getopt
 import Utils as utils
 import os
 
-_FEMALE_NAMES_PATH =  "../../datasets/faces_in_the_wild/female_names.txt"
-#_FEMALE_NAMES_FILE =  "female_names.txt"
-
-_FEMALE_NAMES_PATH1 =  "../../datasets/faces_in_the_wild/female_names.txt"
-_MALE_NAMES_PATH =  "../../datasets/faces_in_the_wild/male_names.txt"
-
-_PHOTOS_DIR = "../../datasets/faces_in_the_wild/lfw-deepfunneled/"
-
-_MALE_LABELS = "malePaths.txt"
-_FEMALE_LABELS = "femalePaths.txt"
-
-def getRelativePath(relativePath):
-    #os.chdir(os.path.normpath(os.path.join(os.getcwd(), relativePath)))
-    return os.path.normpath(os.path.join(os.getcwd(), relativePath))
+_NAMES_PATH =  "../../datasets"
+_MALE_LABELS = "/male_names.txt"
+_FEMALE_LABELS = "/female_names.txt"
+_NEW_LABELS_PATH = "photo_path.txt"
 
 def extractNames(rawLabels):
     cleanLabels = []
@@ -46,7 +36,7 @@ def getPathsToFile(name, parentPath):
 # isMale = True if male, false otherwise.
 def createLabels(setOfNames, isMale):
 
-    photosDir = getRelativePath(_PHOTOS_DIR)
+    photosDir = changeToRelativePath(_PHOTOS_DIR)
     if(isMale):
         LABELS = _MALE_LABELS
     else:
@@ -54,6 +44,7 @@ def createLabels(setOfNames, isMale):
 
     paths = []
     for name in setOfNames:
+        break
         pathsToFile = getPathsToFile(name, photosDir)
         paths.append(pathsToFile)
         #for p in pathsToFile:
@@ -64,9 +55,7 @@ def createLabels(setOfNames, isMale):
 
 def main():
 
-    path = getRelativePath(_FEMALE_NAMES_PATH)
-
-    femaleNames = utils.readLineAsArray(path)
+    femaleNames = utils.readLineAsArray(_NAMES_PATH + _FEMALE_LABELS)
     #maleNames = utils.readLineAsArray(_MALE_NAMES_PATH)
 
     print(femaleNames[0])
@@ -74,14 +63,10 @@ def main():
         utils.writeToFile(_MALE_LABELS, "")
         utils.writeToFile(_FEMALE_LABELS, "")
 
-    #print(os.getcwd())
-    photosPath = getRelativePath(_PHOTOS_DIR)
-
     femaleNames = extractNames(femaleNames)
-    
     #maleNames = extractNames(maleNames)
 
-    createLabels(femaleNames, False)
+    #createLabels(femaleNames, False)
     #createLabels(maleNames, True)
 
     print ("Finished creating labels.")
