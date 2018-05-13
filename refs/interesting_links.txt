@@ -28,6 +28,12 @@ https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/
 
 #  C N N 
 https://www.pyimagesearch.com/2016/08/01/lenet-convolutional-neural-network-in-python/
+https://www.learnopencv.com/image-classification-using-convolutional-neural-networks-in-keras/
+
 
 # SVM for binary classification
 https://es.mathworks.com/help/stats/support-vector-machines-for-binary-classification.html
+
+# Comparing Image Classification Methods:
+# K-Nearest-Neighbor and Support-Vector-Machines
+www.wseas.us/e-library/conferences/2012/CambridgeUSA/MATHCC/MATHCC-18.pdf

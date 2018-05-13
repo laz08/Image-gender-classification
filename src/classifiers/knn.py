@@ -40,12 +40,13 @@ def getImageHistogram(img):
     # Return hist as vect
     return hist.flatten()
 
-def computeEuclideanDistance(ind1, ind2, attrLength = 0):
+def computeEuclideanDistance(ind1, ind2, attrLength = 0, fromAttr=2, toAttr=4):
     # No attr length specified
     if(attrLength == 0):
-        attrLength = len(instance1)
+        attrLength = len(ind1)
 
     d = 0
+    # for x in range(fromAttr, toAttr):
     for x in range(attrLength):
         d += pow((ind1[x] - ind2[x]), 2)
     return (math.sqrt(d))
@@ -61,6 +62,11 @@ def showImage(img):
     cv2.imshow('',img)
     cv2.waitKey(0)
     cv2.destroyAllWindows() 
+
+def usage():
+
+    print ('Usage: main.py -i <inputfile>')
+    sys.exit(2)
 
 def main(argv):
 
@@ -93,13 +99,16 @@ def main(argv):
             img = cv2.imread(image_path, 0)
             if(img is None):
                 print("Could not read image")
+                ind.append("TO_REMOVE")
             else:
                 #showImage(img)
                 ind.append(getImageFeatures(img))
                 ind.append(getImageHistogram(img))
                 
             if(i > 0 and i % 1000 == 0):
-                print("[IMG] % processed {}/{}".format(i, len(mat)))
+                print("[IMG] processed {}/{}. {}%".format(i, len(mat), round(i*100/len(mat), 2)))
+                if(i*100/len(mat) > 10):
+                    break
 
         else:
             print("Path does not exist" + str(image_path))
@@ -114,6 +123,8 @@ def main(argv):
     # ind[1]: Label 
     # ind[2]: image properties
     # ind[3]: img histogram in RGB
+    print(computeEuclideanDistance(mat[0][2], mat[3][2]))
+
 
 if __name__ == "__main__":
    main(sys.argv[1:])
