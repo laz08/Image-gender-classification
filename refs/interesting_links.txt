@@ -22,6 +22,9 @@ http://ufldl.stanford.edu/tutorial/selftaughtlearning/SelfTaughtLearning/
 
 # Knn Classifier Imgs
 https://www.pyimagesearch.com/2016/08/08/k-nn-classifier-for-image-classification/
+https://www.pyimagesearch.com/2014/01/22/clever-girl-a-guide-to-utilizing-color-histograms-for-computer-vision-and-image-search-engines/
+https://www.pyimagesearch.com/2014/07/14/3-ways-compare-histograms-using-opencv-python/
+https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_histograms/py_histogram_begins/py_histogram_begins.html#histograms-getting-started
 
 #  C N N 
 https://www.pyimagesearch.com/2016/08/01/lenet-convolutional-neural-network-in-python/
