@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import sys, getopt, os
+import time
 import math, cv2
 from matplotlib import pyplot as plot
 import Utils
@@ -34,10 +35,12 @@ def getImageHistogram(img):
          None,          # Mask. We dont want to specify a region... yet
          [256],      # Bins. 256 / 8
          [0, 256])      # Range of colors
-    plotHistogram(hist)
+    cv2.normalize(hist, hist)
+    # plotHistogram(hist)
+    # Return hist as vect
+    return hist.flatten()
 
 def computeEuclideanDistance(ind1, ind2, attrLength = 0):
-
     # No attr length specified
     if(attrLength == 0):
         attrLength = len(instance1)
@@ -79,24 +82,33 @@ def main(argv):
 
     print ("Reading from file " + filein)
     mat = Utils.readAsMatrix(filein)
-    print(mat[0][0])
 
-    training, test = splitTrainingTestSet(mat, 0.8)
     # print (len(training))
     # print (len(test))
 
-    for ind in training:
+    startTime = time.time()
+    for i, ind in enumerate(mat):
         image_path = os.path.join(_PATH_TO_PHOTOS, ind[0])
         if os.path.exists(_PATH_TO_PHOTOS):
             img = cv2.imread(image_path, 0)
+            if(img is None):
+                print("Could not read image")
+            else:
+                #showImage(img)
+                ind.append(getImageFeatures(img))
+                ind.append(getImageHistogram(img))
+                
+            if(i > 0 and i % 1000 == 0):
+                print("[IMG] % processed {}/{}".format(i, len(mat)))
 
-            showImage(img)
-
-            ind.append(getImageFeatures(img))
-            ind.append(getImageHistogram(img))
-            break
         else:
             print("Path does not exist" + str(image_path))
+
+    endTime = time.time()
+    elapsedTime = endTime - startTime
+    timeAsStr = time.strftime("%M:%S", time.gmtime(elapsedTime))
+    print("Elapsed time: {}".format(timeAsStr))
+    training, test = splitTrainingTestSet(mat)
 
     # ind[0]: image path
     # ind[1]: Label 
