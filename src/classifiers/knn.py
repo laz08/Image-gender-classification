@@ -90,14 +90,18 @@ def computeAccuracy(realData, predictions):
     failCtr = 0
     for i, rd in enumerate(realData):
         for p in predictions:
+            # print("Real data:{}".format(rd[1]))
             # If index of real/test data is found
             if(i == p[0]):
-                if(rd[1] == p[1]):
+                # print("Predicted data:{}".format(rd[1]))
+                if(str(rd[1]).strip() == str(p[1]).strip()):
                     okCtr += 1
                 else:
                     failCtr += 1
                 break
 
+    print("OK {}".format(okCtr))
+    print("Fail {}".format(failCtr))
     return okCtr*100/len(realData)
 
 def splitTrainingTestSet(data, trainingProp = 0.8):
@@ -138,11 +142,31 @@ def main(argv):
     print ("Reading from file " + filein)
     mat = Utils.readAsMatrix(filein)
 
+    #############################################
+    
+    # ADD 50 50
+    matTmp = []
+    maleCtr = 0
+    femaleCtr = 0
+    toHave = 50
+    for i in mat:
+        if(str(i[1]).strip() == str(_LABEL_MALE) and maleCtr < toHave):
+            maleCtr +=1
+            matTmp.append(i)
+        elif(str(i[1]).strip() == str(_LABEL_FEMALE) and femaleCtr < toHave):
+            femaleCtr +=1
+            matTmp.append(i)
+        if(maleCtr >= 2 and femaleCtr >= 2):
+            break
+
+    mat = matTmp
+    #############################################
+
     imgNotRead = []
     # print (len(training))
     # print (len(test))
-    idxRead = 0         # Idx to be read later of images read
-    propToRead = 3     # Proportion of images to be read
+    idxRead = len(mat)         # Idx to be read later of images read
+    propToRead = 100     # Proportion of images to be read
     startTime = time.time()
     for i, ind in enumerate(mat):
         image_path = os.path.join(_PATH_TO_PHOTOS, ind[0])
@@ -156,7 +180,7 @@ def main(argv):
                 ind.append(getImageFeatures(img))
                 ind.append(getImageHistogram(img))
                 
-            if(i > 0 and i % 100 == 0):
+            if(i > 0 and i % 10 == 0):
                 print("[IMG] processed {}/{}. {}%".format(i, len(mat), round(i*100/len(mat), 2)))
                 if(i*100/len(mat) > propToRead):
                     idxRead = i
