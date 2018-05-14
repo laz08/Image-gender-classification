@@ -156,7 +156,7 @@ def main(argv):
         elif(str(i[1]).strip() == str(_LABEL_FEMALE) and femaleCtr < toHave):
             femaleCtr +=1
             matTmp.append(i)
-        if(maleCtr >= 2 and femaleCtr >= 2):
+        if(maleCtr >= toHave and femaleCtr >= toHave):
             break
 
     mat = matTmp
@@ -213,7 +213,7 @@ def main(argv):
     startTime = time.time()
     predictions = []
     for i, ind in enumerate(test):
-        neighbors = computeNeighbors(training, ind, 1)
+        neighbors = computeNeighbors(training, ind, 5)
         result = getMostSimilar(neighbors)
         predictions.append([i, result])
         if (i > 0 and i % 10 == 0):
