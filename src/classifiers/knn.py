@@ -4,11 +4,11 @@
 import sys, getopt, os
 import time
 import math, cv2
+import operator
 from matplotlib import pyplot as plot
 import Utils
 
 _PATH_TO_PHOTOS = "../../datasets/facesInTheWild/"
-_NO_PHOTO_FLAG = "NO_PHOTO"
 _LABEL_MALE = "MALE"
 _LABEL_FEMALE = "FEMALE"
 
@@ -52,18 +52,17 @@ def computeEuclideanDistance(ind1, ind2, attrLength = 0, fromAttr=2, toAttr=4):
     d = 0
     # for x in range(fromAttr, toAttr):
     for x in range(attrLength):
-        d += pow((ind1[x] - ind2[x]), 2)
+        d += pow((float(ind1[x]) - float(ind2[x])), 2)
     return (math.sqrt(d))
 
     # ind[2]: image properties
     # ind[3]: img histogram in RGB
-def computeNeighbors(data, individualFeats, k = 5):
+def computeNeighbors(data, individual, k = 5):
     neighborsDistances = []
     for n, neighbor in enumerate(data):
-        if(neighbor[2] == _NO_PHOTO_FLAG): pass
         # We save the:
         # [0] neighbor index, [1] label and [2] distance
-        dist = [n, neighbor[1], computeEuclideanDistance(data[n][2], individualFeats)]
+        dist = [n, neighbor[1], computeEuclideanDistance(data[n][2], individual[2])]
         neighborsDistances.append(dist)
 
     # Order by least distance
@@ -139,31 +138,32 @@ def main(argv):
     print ("Reading from file " + filein)
     mat = Utils.readAsMatrix(filein)
 
+    imgNotRead = []
     # print (len(training))
     # print (len(test))
     idxRead = 0         # Idx to be read later of images read
-    propToRead = 10     # Proportion of images to be read
+    propToRead = 3     # Proportion of images to be read
     startTime = time.time()
     for i, ind in enumerate(mat):
         image_path = os.path.join(_PATH_TO_PHOTOS, ind[0])
         if os.path.exists(_PATH_TO_PHOTOS):
             img = cv2.imread(image_path, 0)
             if(img is None):
+                imgNotRead.append(i)
                 print("Could not read image")
-                ind.append(_NO_PHOTO_FLAG)
             else:
                 #showImage(img)
                 ind.append(getImageFeatures(img))
                 ind.append(getImageHistogram(img))
                 
-            if(i > 0 and i % 1000 == 0):
+            if(i > 0 and i % 100 == 0):
                 print("[IMG] processed {}/{}. {}%".format(i, len(mat), round(i*100/len(mat), 2)))
                 if(i*100/len(mat) > propToRead):
                     idxRead = i
                     break
 
         else:
-            ind.append(_NO_PHOTO_FLAG)
+            imgNotRead.append(i)
             print("Path does not exist" + str(image_path))
 
     endTime = time.time()
@@ -171,20 +171,35 @@ def main(argv):
     timeAsStr = time.strftime("%M:%S", time.gmtime(elapsedTime))
     print("Elapsed time: {}".format(timeAsStr))
 
+    print("Removing images that could not be read...")
     mat = mat[0:idxRead]
+    for imgIdx in imgNotRead:
+        del mat[imgIdx]
+    print("Done.")
+
+    print("Splitting dataset...")
     training, test = splitTrainingTestSet(mat)
+    print("Done.")
 
     # ind[0]: image path
     # ind[1]: Label 
     # ind[2]: image properties
     # ind[3]: img histogram in RGB
+    print("Computing neighbors of test data with training of {} images".format(len(training)))
+    startTime = time.time()
     predictions = []
     for i, ind in enumerate(test):
-        if(ind[2] == _NO_PHOTO_FLAG):
-            pass
         neighbors = computeNeighbors(training, ind, 1)
         result = getMostSimilar(neighbors)
         predictions.append([i, result])
+        if (i > 0 and i % 10 == 0):
+            print("[IMG] neigh. processed {}/{}. {}%".format(i, len(test), round(i * 100 / len(test), 2)))
+
+    endTime = time.time()
+    print("Done.")
+    elapsedTime = endTime - startTime
+    timeAsStr = time.strftime("%M:%S", time.gmtime(elapsedTime))
+    print("Elapsed time: {}".format(timeAsStr))
 
     acc = computeAccuracy(test, predictions)
     print("Accuracy: {}%".format(acc))
