@@ -37,3 +37,7 @@ https://es.mathworks.com/help/stats/support-vector-machines-for-binary-classific
 # Comparing Image Classification Methods:
 # K-Nearest-Neighbor and Support-Vector-Machines
 www.wseas.us/e-library/conferences/2012/CambridgeUSA/MATHCC/MATHCC-18.pdf
+
+
+# Eigen faces
+https://www.learnopencv.com/eigenface-using-opencv-c-python/

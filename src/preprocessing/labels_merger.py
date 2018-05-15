@@ -7,7 +7,7 @@ import os
 _NAMES_PATH =  "../../datasets"
 _MALE_LABELS = "/male_names.txt"
 _FEMALE_LABELS = "/female_names.txt"
-_MERGED_FILE = "labels.txt"
+_MERGED_FILE = "merged_labels.txt"
 
 
 def writeToFile(fileOut, contents):
@@ -48,7 +48,14 @@ def main():
     maleNames = readLineAsArrayWithAppend(_NAMES_PATH + _MALE_LABELS, "MALE")
 
     finalStr = ""
-    for name in femaleNames + maleNames:
+
+    print("Female names size: {}".format(len(femaleNames)))
+    print("Male names size: {}".format(len(maleNames)))
+
+    subsetMaleNames = maleNames[0:len(femaleNames)]
+    print("Subset male names size: {}".format(len(subsetMaleNames)))
+
+    for name in femaleNames + subsetMaleNames:
         finalStr = finalStr + name + "\n"
     writeToFile(_MERGED_FILE, finalStr)
 
