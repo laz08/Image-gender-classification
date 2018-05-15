@@ -69,14 +69,15 @@ def computeNeighbors(data, individual, k = 5):
     neighborsDistances.sort(key=operator.itemgetter(2))
     neighbors = []
     for i in range(k):
-        neighbors.append(neighborsDistances[k])
+        print(neighborsDistances[i])
+        neighbors.append(neighborsDistances[i])
     return neighbors
 
 def getMostSimilar(neighbors):
     femaleCount = 0
     maleCount = 0
     for n in neighbors:
-        if(n[1] == _LABEL_MALE):
+        if(str(n[1]).strip() == str(_LABEL_MALE).strip()):
             maleCount += 1
         else:
             femaleCount += 1
@@ -170,7 +171,7 @@ def main(argv):
     matTmp = []
     maleCtr = 0
     femaleCtr = 0
-    toHave = 200
+    toHave = 100
     for i in mat:
         if(str(i[1]).strip() == str(_LABEL_MALE) and maleCtr < toHave):
             maleCtr +=1
@@ -227,6 +228,9 @@ def main(argv):
     training, test = splitTrainingTestSet(mat)
     print("Done.")
 
+
+
+    k = 5
     # ind[0]: image path
     # ind[1]: Label 
     # ind[2]: image properties
@@ -235,7 +239,7 @@ def main(argv):
     startTime = time.time()
     predictions = []
     for i, ind in enumerate(test):
-        neighbors = computeNeighbors(training, ind, 5)
+        neighbors = computeNeighbors(training, ind, k)
         result = getMostSimilar(neighbors)
         predictions.append([i, result])
         if (i > 0 and i % 10 == 0):
