@@ -86,6 +86,8 @@ def getMostSimilar(neighbors):
     return _LABEL_FEMALE
 
 def computeAccuracy(realData, predictions):
+    femalePredCtr = 0
+    malePredCtr = 0
     print("============")
     okCtr = 0
     failCtr = 0
@@ -94,7 +96,13 @@ def computeAccuracy(realData, predictions):
         for p in predictions:
             # If index of real/test data is found
             if(i == p[0]):
-                print("Predicted: {} || Real: {}".format(p[1], rd[1]))
+
+                if(str(p[1]).strip() == str(_LABEL_MALE).strip()):
+                    malePredCtr += 1
+                else:
+                    femalePredCtr += 1
+
+               # print("Predicted: {} || Real: {}".format(p[1], rd[1]))
                # print(rd[1])
                # print(p[1])
                # print(str(rd[1]).strip() == str(p[1]).strip())
@@ -106,6 +114,8 @@ def computeAccuracy(realData, predictions):
 
     print("OK {}".format(okCtr))
     print("Fail {}".format(failCtr))
+    print("Male predicted {}".format(malePredCtr))
+    print("Female predicted {}".format(femalePredCtr))
     return okCtr*100/len(realData)
 
 def splitTrainingTestSet(data, trainingProp = 0.8):
@@ -160,7 +170,7 @@ def main(argv):
     matTmp = []
     maleCtr = 0
     femaleCtr = 0
-    toHave = 100
+    toHave = 200
     for i in mat:
         if(str(i[1]).strip() == str(_LABEL_MALE) and maleCtr < toHave):
             maleCtr +=1
