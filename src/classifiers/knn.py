@@ -4,7 +4,7 @@
 import sys, getopt, os
 import time
 import math, cv2
-import operator
+import operator, random
 from matplotlib import pyplot as plot
 import Utils
 
@@ -86,14 +86,18 @@ def getMostSimilar(neighbors):
     return _LABEL_FEMALE
 
 def computeAccuracy(realData, predictions):
+    print("============")
     okCtr = 0
     failCtr = 0
     for i, rd in enumerate(realData):
+        # print("Real data:{}".format(rd[1]))
         for p in predictions:
-            # print("Real data:{}".format(rd[1]))
             # If index of real/test data is found
             if(i == p[0]):
-                # print("Predicted data:{}".format(rd[1]))
+                print("Predicted: {} || Real: {}".format(p[1], rd[1]))
+               # print(rd[1])
+               # print(p[1])
+               # print(str(rd[1]).strip() == str(p[1]).strip())
                 if(str(rd[1]).strip() == str(p[1]).strip()):
                     okCtr += 1
                 else:
@@ -105,10 +109,18 @@ def computeAccuracy(realData, predictions):
     return okCtr*100/len(realData)
 
 def splitTrainingTestSet(data, trainingProp = 0.8):
-    # todo make it randomly, not this straightforward
-    idxToCut = int(trainingProp * len(data))
-    training = data[0:idxToCut]
-    test = data[idxToCut+1:len(data)]
+    training = []
+    test = []
+    for d in data:
+        r=random.random()
+        if(r <= trainingProp):
+            training.append(d)
+        else:
+            test.append(d)
+
+    #idxToCut = int(trainingProp * len(data))
+    #training = data[0:idxToCut]
+    #test = data[idxToCut+1:len(data)]
     return training, test
 
 def showImage(img):
@@ -144,11 +156,11 @@ def main(argv):
 
     #############################################
     
-    # ADD 50 50
+    # ADD 50 50 %
     matTmp = []
     maleCtr = 0
     femaleCtr = 0
-    toHave = 50
+    toHave = 100
     for i in mat:
         if(str(i[1]).strip() == str(_LABEL_MALE) and maleCtr < toHave):
             maleCtr +=1
