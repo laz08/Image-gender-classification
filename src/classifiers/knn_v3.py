@@ -10,6 +10,9 @@ import operator, random
 from matplotlib import pyplot as plot
 import Utils
 from sklearn.svm import LinearSVC
+from sklearn.neighbors import KNeighborsClassifier, RadiusNeighborsClassifier, NearestNeighbors
+from sklearn.neural_network import MLPClassifier
+from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
 
@@ -99,26 +102,23 @@ def computeAccuracy(realData, predictions):
     print("============")
     okCtr = 0
     failCtr = 0
-    for i, rd in enumerate(realData):
-        # print("Real data:{}".format(rd[1]))
-        for p in predictions:
-            # If index of real/test data is found
-            if(i == p[0]):
 
-                if(str(p[1]).strip() == str(_LABEL_MALE).strip()):
-                    malePredCtr += 1
-                else:
-                    femalePredCtr += 1
+    print(predictions)
+    numPred = len(predictions)
+    numReal = len(realData)
+    print("Length " + str(numPred) + " - " + str(numReal))
 
-               # print("Predicted: {} || Real: {}".format(p[1], rd[1]))
-               # print(rd[1])
-               # print(p[1])
-               # print(str(rd[1]).strip() == str(p[1]).strip())
-                if(str(rd[1]).strip() == str(p[1]).strip()):
-                    okCtr += 1
-                else:
-                    failCtr += 1
-                break
+    realLabels = [item[1] for item in realData]
+    for i, predictedLabel in enumerate(predictions):
+        print("Real:" + realLabels[i] + "Predicted: " + predictedLabel)
+        if(str(predictedLabel).strip() == str(_LABEL_MALE).strip()):
+            malePredCtr += 1
+        else:
+            femalePredCtr += 1
+        if(str(realLabels[i]).strip() == str(predictedLabel).strip()):
+            okCtr += 1
+        else:
+            failCtr += 1
 
     print("OK {}".format(okCtr))
     print("Fail {}".format(failCtr))
@@ -168,6 +168,111 @@ def describe(numPoints, image, radius, eps=1e-7):
     # return the histogram of Local Binary Patterns
     return hist
 
+def performLinearSVC(training, test):
+
+    model = LinearSVC(C=100.0, random_state=42)
+    model.fit([item[2] for item in training], [item[1] for item in training])
+
+    prediction = model.predict([item[2] for item in test])
+
+    print(prediction)
+    numPred = len(prediction)
+    numReal = len(test)
+    numTrain = len(training)
+    print("Length " + str(numPred) + " - " + str(numReal) + " - " + str(numTrain))
+
+    acc = computeAccuracy(test, prediction)
+    return acc
+
+
+def performKNeighbors(training, test):
+    # train and evaluate a k-NN classifer on the histogram
+    # representations
+    print("[INFO] evaluating histogram accuracy...")
+    model = KNeighborsClassifier(10)
+    model.fit([item[2] for item in training], [item[1] for item in training])
+
+    #acc = model.score([item[2] for item in test], [item[1] for item in test])
+    prediction = model.predict([item[2] for item in test])
+
+    print(prediction)
+    numPred = len(prediction)
+    numReal = len(test)
+    numTrain = len(training)
+    print("Length " + str(numPred) + " - " + str(numReal) + " - " + str(numTrain))
+
+    acc = computeAccuracy(test, prediction)
+
+    #print("[INFO] histogram accuracy: {:.2f}%".format(acc * 100))
+    return acc
+
+def performRadiusNeighbors(training, test):
+    # train and evaluate a k-NN classifer on the histogram
+    # representations
+    print("[INFO] evaluating histogram accuracy...")
+    model = RadiusNeighborsClassifier(0.5)
+    #model = NearestNeighbors()
+    model.fit([item[2] for item in training], [item[1] for item in training])
+
+    #acc = model.score([item[2] for item in test], [item[1] for item in test])
+    prediction = model.predict([item[2] for item in test])
+
+    print(prediction)
+    numPred = len(prediction)
+    numReal = len(test)
+    numTrain = len(training)
+    print("Length " + str(numPred) + " - " + str(numReal) + " - " + str(numTrain))
+
+    acc = computeAccuracy(test, prediction)
+
+    #print("[INFO] histogram accuracy: {:.2f}%".format(acc * 100))
+    return acc
+
+
+def performMLPClassifier(training, test):
+    # train and evaluate a k-NN classifer on the histogram
+    # representations
+    print("[INFO] evaluating histogram accuracy...")
+    model = MLPClassifier(solver='lbfgs')
+    #model = NearestNeighbors()
+    model.fit([item[2] for item in training], [item[1] for item in training])
+
+    #acc = model.score([item[2] for item in test], [item[1] for item in test])
+    prediction = model.predict([item[2] for item in test])
+
+    print(prediction)
+    numPred = len(prediction)
+    numReal = len(test)
+    numTrain = len(training)
+    print("Length " + str(numPred) + " - " + str(numReal) + " - " + str(numTrain))
+
+    acc = computeAccuracy(test, prediction)
+
+    #print("[INFO] histogram accuracy: {:.2f}%".format(acc * 100))
+    return acc
+
+def performDecisionTreeClassifier(training, test):
+    # train and evaluate a k-NN classifer on the histogram
+    # representations
+    print("[INFO] evaluating histogram accuracy...")
+    model = DecisionTreeClassifier()
+    #model = NearestNeighbors()
+    model.fit([item[2] for item in training], [item[1] for item in training])
+
+    #acc = model.score([item[2] for item in test], [item[1] for item in test])
+    prediction = model.predict([item[2] for item in test])
+
+    print(prediction)
+    numPred = len(prediction)
+    numReal = len(test)
+    numTrain = len(training)
+    print("Length " + str(numPred) + " - " + str(numReal) + " - " + str(numTrain))
+
+    acc = computeAccuracy(test, prediction)
+
+    #print("[INFO] histogram accuracy: {:.2f}%".format(acc * 100))
+    return acc
+
 
 def main(argv):
 
@@ -191,14 +296,13 @@ def main(argv):
 
     print ("Reading from file " + filein)
     mat = Utils.readAsMatrix(filein)
-
     #############################################
     
     # ADD 50 50 %
     matTmp = []
     maleCtr = 0
     femaleCtr = 0
-    toHave = 1000
+    toHave = 2000
     for i in mat:
         if(str(i[1]).strip() == str(_LABEL_MALE) and maleCtr < toHave):
             maleCtr +=1
@@ -227,28 +331,36 @@ def main(argv):
                 print("Could not read image")
             else:
                 #print("Image read")
-                resized = cv2.resize(image, (128, 128), cv2.INTER_LINEAR)
+                #print("Shape" + str(image.shape))
+                height, width = image.shape
+                resized = cv2.resize(image, (width, height))
                 #gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
                 hist = describe(24, resized, 8)
+                cv2.normalize(hist, hist)
+                hist.flatten()
                 data.append(hist)
                 ind.append(hist)
-                print("label" + str(ind[1]))
+                #print("label" + str(ind[1]))
                 labels.append(ind[1])
         else:
             imgNotRead.append(i)
             print("Path does not exist" + str(image_path))
 
+    print("Removing images that could not be read...")
+    mat = mat[0:idxRead]
+    for imgIdx in imgNotRead:
+        del mat[imgIdx]
+    print("Done.")
+
+    training, test = splitTrainingTestSet(mat)
+
     # train a Linear SVM on the data
-    model = LinearSVC(C=100.0, random_state=42)
-    model.fit(data, labels)
+    #acc = performLinearSVC(training, test)
+    #acc = performKNeighbors(training, test)
+    #acc = performMLPClassifier(training, test)
+    acc = performDecisionTreeClassifier(training, test)
 
-    image = cv2.imread('../../datasets/facesInTheWild/Adam_Sandler_0002.jpg', 0)
-    resized = cv2.resize(image, (150, 150), cv2.INTER_LINEAR)
-    #gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    hist = describe(24, resized, 8)
-    prediction = model.predict(hist.reshape(1,-1))[0]
-    print("Prediction" + str(prediction))
-
+    print("Accuracy: {}%".format(acc))
 
     endTime = time.time()
     elapsedTime = endTime
