@@ -274,6 +274,24 @@ def performDecisionTreeClassifier(training, test):
     return acc
 
 
+def cropToFace(img):
+    # Y axis Crop
+    # y = 64
+    y = 80
+    # h = 116
+    h = 100
+
+
+    # X axis crop
+    #x = 80
+    x = 90
+    #w = 90
+    w = 80
+
+    face = img[y:y+h, x:x+w]
+
+    return face
+
 def main(argv):
 
     data = []
@@ -332,9 +350,14 @@ def main(argv):
             else:
                 #print("Image read")
                 #print("Shape" + str(image.shape))
+               
+                image = cropToFace(image)
+               
                 height, width = image.shape
                 resized = cv2.resize(image, (width, height))
+               
                 #gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                #hist = describe(24, resized, 8)
                 hist = describe(24, resized, 8)
                 cv2.normalize(hist, hist)
                 hist.flatten()
@@ -355,10 +378,10 @@ def main(argv):
     training, test = splitTrainingTestSet(mat)
 
     # train a Linear SVM on the data
-    #acc = performLinearSVC(training, test)
-    #acc = performKNeighbors(training, test)
+    acc = performLinearSVC(training, test)
+    # acc = performKNeighbors(training, test)
     #acc = performMLPClassifier(training, test)
-    acc = performDecisionTreeClassifier(training, test)
+    #acc = performDecisionTreeClassifier(training, test)
 
     print("Accuracy: {}%".format(acc))
 
