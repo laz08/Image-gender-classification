@@ -55,15 +55,22 @@ def main():
     subsetMaleNames = maleNames[0:len(femaleNames)]
     print("Subset male names size: {}".format(len(subsetMaleNames)))
 
-    for name in zip(femaleNames, subsetMaleNames):
-        finalStr = finalStr + name + "\n"
+    useZip = False
+    if useZip:
+        names = list(zip(femaleNames, subsetMaleNames))
+
+        for name in names:
+            finalStr = finalStr + name[0] + "\n"
+            finalStr = finalStr + name[1] + "\n"
+
+    else:
+        names = list((femaleNames + subsetMaleNames))
+        for name in names:
+            finalStr = finalStr + name + "\n"
+
     writeToFile(_MERGED_FILE, finalStr)
 
     print ("Finished creating labels.")
-
-
-
-
 
 if __name__ == "__main__":
    main()
