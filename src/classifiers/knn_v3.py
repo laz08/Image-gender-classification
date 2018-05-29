@@ -13,6 +13,13 @@ from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier, RadiusNeighborsClassifier, NearestNeighbors
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
+from sklearn.model_selection import cross_val_score, KFold
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn import metrics
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -21,7 +28,7 @@ _LABEL_MALE = "MALE"
 _LABEL_FEMALE = "FEMALE"
 
 
-def getImageFeatures(img, size = (150, 150)):
+def getImageFeatures(img, size =  (150, 150)):
     "Resizes to 150x150 and Flatten: List of raw pixel intensities"
     #cv2.face.createLBPHFaceRecognizer()
     model = cv2.face.FisherFaceRecognizer_create()
@@ -135,7 +142,6 @@ def splitTrainingTestSet(data, trainingProp = 0.8):
             training.append(d)
         else:
             test.append(d)
-
     #idxToCut = int(trainingProp * len(data))
     #training = data[0:idxToCut]
     #test = data[idxToCut+1:len(data)]
@@ -168,12 +174,7 @@ def describe(numPoints, image, radius, eps=1e-7):
     # return the histogram of Local Binary Patterns
     return hist
 
-def performLinearSVC(training, test):
-
-    model = LinearSVC(C=100.0, random_state=42)
-    model.fit([item[2] for item in training], [item[1] for item in training])
-
-    prediction = model.predict([item[2] for item in test])
+def checkResultsPredicted(test, training, prediction):
 
     print(prediction)
     numPred = len(prediction)
@@ -182,7 +183,48 @@ def performLinearSVC(training, test):
     print("Length " + str(numPred) + " - " + str(numReal) + " - " + str(numTrain))
 
     acc = computeAccuracy(test, prediction)
+    print("Type " + str(type(test)))
+    print("Type " + str(type(prediction)))
+    realLabels = [item[1] for item in test]
+    tn, fp, fn, tp = confusion_matrix(realLabels, prediction).ravel()
+    accuracy = (tp+tn)/len(prediction)
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    print("Accuracy " + str(accuracy))
+    print("Precision " + str(precision))
+    print("Recall " + str(recall))
+    #fpr, tpr, thresholds = roc_curve(realLabels, prediction, pos_label=2)
+    #metrics.auc(fpr, tpr)
     return acc
+
+def performLinearSVC(training, test, mat):
+
+    #scalar = StandardScaler()
+    #clf = LinearSVC(C=100.0, random_state=42)
+
+    #pipeline = Pipeline([('transformer', scalar), ('estimator', clf)])
+
+    #tfidf = TfidfVectorizer()
+
+    #vect_data = tfidf.fit_transform(np.array([item[2] for item in training]))
+    #vect_data1 = tfidf.fit_transform([item[2] for item in training])
+
+
+    #cv = KFold(n_splits=40)
+    #print("K value: " + str(cv))
+    #scores = cross_val_score(clf, [item[2] for item in mat], [item[1] for item in mat], cv = cv)
+    #print("Scores "+ str(scores))
+    #print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() / 2))
+
+    model = LinearSVC(C=100.0, random_state=42)
+    #model = LinearSVC(loss='l2', penalty='l1', dual=False)
+    model.fit([item[2] for item in training], [item[1] for item in training])
+
+    prediction = model.predict([item[2] for item in test])
+    #scores = cross_val_score(prediction, mat, [item[2] for item in training], cv=5)
+    #scores
+    acc = checkResultsPredicted(test, training, prediction)
+    return 0
 
 
 def performKNeighbors(training, test):
@@ -195,15 +237,7 @@ def performKNeighbors(training, test):
     #acc = model.score([item[2] for item in test], [item[1] for item in test])
     prediction = model.predict([item[2] for item in test])
 
-    print(prediction)
-    numPred = len(prediction)
-    numReal = len(test)
-    numTrain = len(training)
-    print("Length " + str(numPred) + " - " + str(numReal) + " - " + str(numTrain))
-
-    acc = computeAccuracy(test, prediction)
-
-    #print("[INFO] histogram accuracy: {:.2f}%".format(acc * 100))
+    acc = checkResultsPredicted(test, training, prediction)
     return acc
 
 def performRadiusNeighbors(training, test):
@@ -217,15 +251,8 @@ def performRadiusNeighbors(training, test):
     #acc = model.score([item[2] for item in test], [item[1] for item in test])
     prediction = model.predict([item[2] for item in test])
 
-    print(prediction)
-    numPred = len(prediction)
-    numReal = len(test)
-    numTrain = len(training)
-    print("Length " + str(numPred) + " - " + str(numReal) + " - " + str(numTrain))
+    acc = checkResultsPredicted(test, training, prediction)
 
-    acc = computeAccuracy(test, prediction)
-
-    #print("[INFO] histogram accuracy: {:.2f}%".format(acc * 100))
     return acc
 
 
@@ -240,15 +267,8 @@ def performMLPClassifier(training, test):
     #acc = model.score([item[2] for item in test], [item[1] for item in test])
     prediction = model.predict([item[2] for item in test])
 
-    print(prediction)
-    numPred = len(prediction)
-    numReal = len(test)
-    numTrain = len(training)
-    print("Length " + str(numPred) + " - " + str(numReal) + " - " + str(numTrain))
+    acc = checkResultsPredicted(test, training, prediction)
 
-    acc = computeAccuracy(test, prediction)
-
-    #print("[INFO] histogram accuracy: {:.2f}%".format(acc * 100))
     return acc
 
 def performDecisionTreeClassifier(training, test):
@@ -262,15 +282,8 @@ def performDecisionTreeClassifier(training, test):
     #acc = model.score([item[2] for item in test], [item[1] for item in test])
     prediction = model.predict([item[2] for item in test])
 
-    print(prediction)
-    numPred = len(prediction)
-    numReal = len(test)
-    numTrain = len(training)
-    print("Length " + str(numPred) + " - " + str(numReal) + " - " + str(numTrain))
+    acc = checkResultsPredicted(test, training, prediction)
 
-    acc = computeAccuracy(test, prediction)
-
-    #print("[INFO] histogram accuracy: {:.2f}%".format(acc * 100))
     return acc
 
 
@@ -283,14 +296,20 @@ def cropToFace(img):
 
 
     # X axis crop
-    #x = 80
-    x = 90
-    #w = 90
-    w = 80
+    x = 80
+    #x = 90
+    w = 90
+    #w = 80
 
     face = img[y:y+h, x:x+w]
 
     return face
+
+def plotImage(image):
+    cv2.imshow('image', image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
 
 def main(argv):
 
@@ -320,7 +339,7 @@ def main(argv):
     matTmp = []
     maleCtr = 0
     femaleCtr = 0
-    toHave = 2000
+    toHave = 20
     for i in mat:
         if(str(i[1]).strip() == str(_LABEL_MALE) and maleCtr < toHave):
             maleCtr +=1
@@ -331,7 +350,12 @@ def main(argv):
         if(maleCtr >= toHave and femaleCtr >= toHave):
             break
 
-    mat = matTmp
+    #image_path = os.path.join(_PATH_TO_PHOTOS, mat[0][0])
+    #image = cv2.imread(image_path)
+    #plotImage(image)
+    #image_path = os.path.join(_PATH_TO_PHOTOS, mat[1][0])
+    #image = cv2.imread(image_path)
+    #plotImage(image)
     #############################################
 
     imgNotRead = []
@@ -350,11 +374,18 @@ def main(argv):
             else:
                 #print("Image read")
                 #print("Shape" + str(image.shape))
-               
+                #if(i<5):
+                #    image1 = cv2.imread(image_path)
+                #    plotImage(image1)
+
                 image = cropToFace(image)
                
                 height, width = image.shape
                 resized = cv2.resize(image, (width, height))
+
+                #cv2.imshow('image',resized)
+                #cv2.waitKey(0)
+                #cv2.destroyAllWindows()
                
                 #gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
                 #hist = describe(24, resized, 8)
@@ -378,7 +409,7 @@ def main(argv):
     training, test = splitTrainingTestSet(mat)
 
     # train a Linear SVM on the data
-    acc = performLinearSVC(training, test)
+    acc = performLinearSVC(training, test, mat)
     # acc = performKNeighbors(training, test)
     #acc = performMLPClassifier(training, test)
     #acc = performDecisionTreeClassifier(training, test)
@@ -389,7 +420,6 @@ def main(argv):
     elapsedTime = endTime
     timeAsStr = time.strftime("%M:%S", time.gmtime(elapsedTime))
     print("Elapsed time: {}".format(timeAsStr))
-
 
     endTime = time.time()
     print("Done.")
