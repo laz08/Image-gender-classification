@@ -55,7 +55,7 @@ def main():
     subsetMaleNames = maleNames[0:len(femaleNames)]
     print("Subset male names size: {}".format(len(subsetMaleNames)))
 
-    for name in femaleNames + subsetMaleNames:
+    for name in zip(femaleNames, subsetMaleNames):
         finalStr = finalStr + name + "\n"
     writeToFile(_MERGED_FILE, finalStr)
 
