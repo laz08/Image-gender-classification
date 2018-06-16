@@ -49,7 +49,8 @@ def computeAccuracy(realData, predictions):
 
 def checkResultsPredicted(test, training, prediction):
 
-	print(prediction)
+	if(const._DEBUG):
+		print(prediction)
 	numPred = len(prediction)
 	numReal = len(test)
 	numTrain = len(training)

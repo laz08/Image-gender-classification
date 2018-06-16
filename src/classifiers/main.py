@@ -38,21 +38,25 @@ def main(argv):
         elif opt in ("-s", "--source"):
             filein = arg
 
-    print ("Reading from file " + filein)
+    print ("[1] Reading from file " + filein)
     mat = Utils.readAsMatrix(filein)
 
+
     #############################################
-    imagesNumberPerGender = 100		# If the num. of images is greater than the maximum of them, then it reads all of them
+    imagesNumberPerGender = 3000    # If the num. of images is greater than the maximum of them, then it reads all of them
+    print("[2] Forcing gender parity up to {} images per gender".format(imagesNumberPerGender))
     mat = Utils.forceGenderParityUpToN(mat, imagesNumberPerGender)
     #############################################
 
+    print("[3] Extracting features...")
     mat = Utils.readImages(mat)
 
+    print("[4] Splitting on training/test set...")
     training, test = Utils.splitTrainingTestSet(mat)
 
-    # train a Linear SVM on the data
     if PERFORM_KNN:
 
+        print("[5] Method chosen: KNN")
         startTime = time.time()
 
         acc = cm.performKNeighbors(training, test)
@@ -65,6 +69,7 @@ def main(argv):
 
     if PERFORM_SVM:
 
+        print("[5] Method chosen: SVM")
         startTime = time.time()
 
         acc = cm.performLinearSVC(training, test, mat)
@@ -77,6 +82,7 @@ def main(argv):
 
     if PERFORM_MLP:
 
+        print("[5] Method chosen: MLP")
         startTime = time.time()
 
         acc = cm.performMLPClassifier(training, test)
