@@ -52,18 +52,22 @@ def appendLineToFile(fileout, line):
 
 
 
-def splitTrainingTestSet(data, trainingProp = 0.8):
+def splitTrainingTestSet(data, trainingProp = 0.8, rand = True):
     training = []
     test = []
-    for d in data:
-        r=random.random()
-        if(r <= trainingProp):
-            training.append(d)
-        else:
-            test.append(d)
-    #idxToCut = int(trainingProp * len(data))
-    #training = data[0:idxToCut]
-    #test = data[idxToCut+1:len(data)]
+    
+    if(rand):
+        for d in data:
+            r=random.random()
+            if(r <= trainingProp):
+                training.append(d)
+            else:
+                test.append(d)
+    else:
+        idxToCut = int(trainingProp * len(data))
+        training = data[0:idxToCut]
+        test = data[idxToCut+1:len(data)]
+    
     return training, test
 
 
@@ -82,8 +86,7 @@ def describe(numPoints, image, radius, eps=1e-7):
     # compute the Local Binary Pattern representation
     # of the image, and then use the LBP representation
     # to build the histogram of patterns
-    lbp = feature.local_binary_pattern(image, numPoints,
-        radius, method="uniform")
+    lbp = feature.local_binary_pattern(image, numPoints, radius, method="uniform")
     (hist, _) = np.histogram(lbp.ravel(),
         bins=np.arange(0, numPoints + 3),
         range=(0, numPoints + 2))
@@ -143,6 +146,13 @@ def forceGenderParityUpToN(mat, N):
 
 def readImages(mat):
 
+    numPoints = 24
+    rad = 8
+
+    numPoints = 16
+    rad = 2
+    print("[*] Extracting features using LBP, {} points, radius {}".format(numPoints, rad))
+
     imgNotRead = []
     # print (len(training))
     # print (len(test))
@@ -163,20 +173,16 @@ def readImages(mat):
                     print("Could not read image")
             
             else:
-                image = cropToFace(image)
-               
+                image = cropToFace(image)               
                 height, width = image.shape
                 resized = cv2.resize(image, (width, height))
 
-                #cv2.imshow('image',resized)
-                #cv2.waitKey(0)
-                #cv2.destroyAllWindows()
-               
-                #gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-                #hist = describe(24, resized, 8)
-                hist = describe(24, resized, 8)
+                #plotImage(resized)
+
+                hist = describe(numPoints, resized, rad)
                 cv2.normalize(hist, hist)
                 hist.flatten()
+
                 ind.append(hist)
                
         else:

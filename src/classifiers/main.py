@@ -52,20 +52,19 @@ def main(argv):
     mat = Utils.readImages(mat)
 
     print("[4] Splitting on training/test set...")
-    training, test = Utils.splitTrainingTestSet(mat)
+    training, test = Utils.splitTrainingTestSet(mat, 0.8, False)
 
     if PERFORM_KNN:
 
         print("[5] Method chosen: KNN")
         startTime = time.time()
 
-        acc = cm.performKNeighbors(training, test)
-        print("Accuracy with Knn: {}%".format(acc))
+        acc = cm.performKNeighbors(training, test, 7)
+        #print("Accuracy with Knn: {}%".format(acc))
 
         endTime = time.time()
         elapsedTime = endTime - startTime
-        timeAsStr = time.strftime("%M:%S", time.gmtime(elapsedTime))
-        print("Elapsed time: {}".format(timeAsStr))
+        print("Elapsed time: {} s".format(round(elapsedTime, 4)))
 
     if PERFORM_SVM:
 
@@ -73,12 +72,11 @@ def main(argv):
         startTime = time.time()
 
         acc = cm.performLinearSVC(training, test, mat)
-        print("SVM accuracy: {}%".format(acc))
+        #print("SVM accuracy: {}%".format(acc))
 
         endTime = time.time()
         elapsedTime = endTime - startTime
-        timeAsStr = time.strftime("%M:%S", time.gmtime(elapsedTime))
-        print("Elapsed time: {}".format(timeAsStr))
+        print("Elapsed time: {} s".format(round(elapsedTime, 4)))
 
     if PERFORM_MLP:
 
@@ -90,8 +88,7 @@ def main(argv):
 
         endTime = time.time()
         elapsedTime = endTime - startTime
-        timeAsStr = time.strftime("%M:%S", time.gmtime(elapsedTime))
-        print("Elapsed time: {}".format(timeAsStr))
+        print("Elapsed time: {} s".format(round(elapsedTime, 4)))
 
     if PERFORM_RAND_FOREST:
 
@@ -102,7 +99,6 @@ def main(argv):
 
         endTime = time.time()
         elapsedTime = endTime - startTime
-        timeAsStr = time.strftime("%M:%S", time.gmtime(elapsedTime))
         print("Elapsed time: {}".format(timeAsStr))
     
    

@@ -41,10 +41,11 @@ def computeAccuracy(realData, predictions):
 		else:
 			failCtr += 1
 
-	print("OK {}".format(okCtr))
-	print("Fail {}".format(failCtr))
-	print("Male predicted {}".format(malePredCtr))
-	print("Female predicted {}".format(femalePredCtr))
+	print("    ==== RESULTS ====")
+	print("    [*] OK {}".format(okCtr))
+	print("    [*] Fail {}".format(failCtr))
+	print("    [*] Male predicted {}".format(malePredCtr))
+	print("    [*] Female predicted {}".format(femalePredCtr))
 	return okCtr*100/len(realData)
 
 def checkResultsPredicted(test, training, prediction):
@@ -68,9 +69,10 @@ def checkResultsPredicted(test, training, prediction):
 	precision = tp / (tp + fp)
 	recall = tp / (tp + fn)
 	
-	print("Accuracy " + str(accuracy))
-	print("Precision " + str(precision))
-	print("Recall " + str(recall))
+	print("\n    ==== METRICS ====")
+	print("    [*] Accuracy: {}".format(round(accuracy, 4)))
+	print("    [*] Precision: {}".format(round(precision, 4)))
+	print("    [*] Recall: {} \n".format(round(recall, 4)))
 	#fpr, tpr, thresholds = roc_curve(realLabels, prediction, pos_label=2)
 	#metrics.auc(fpr, tpr)
 	return acc
@@ -81,9 +83,9 @@ def performLinearSVC(training, test, mat):
 	return checkResultsPredicted(test, training, prediction)
 
 
-def performKNeighbors(training, test):
+def performKNeighbors(training, test, k):
 
-	prediction = Knn.performKNN(training, test)
+	prediction = Knn.performKNN(training, test, k)
 	return checkResultsPredicted(test, training, prediction)
 
 
