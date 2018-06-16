@@ -7,10 +7,15 @@ from termcolor import colored
 import numpy as np
 import os
 import cv2
+import csv
 import h5py
+import sys
 
-WIDTH = 250 # 180 for captcha6_level2/4
-HEIGHT = 250
+sys.path.insert(0, 'src/classifiers/')
+import Utils
+
+WIDTH = 90 # 180 for captcha6_level2/4
+HEIGHT = 100
 
 # fix random seed for reproducibility
 seed = 7
@@ -27,21 +32,30 @@ loaded_model = model_from_json(loaded_model_json)
 loaded_model.load_weights("captcha6_20k_orig_model.h5")
 print("Loaded model from disk")
 
-
 # print("Treating Zeros and O's fairly - Incorrect predictions are colored white.")
 
 # we have x-number images to predict values for
 a_array = ["MALE", "FEMALE"]
 
-input_file = open('datasets/predict_labels.txt')
+input_file = csv.reader(open('src/preprocessing/all_labels_old.txt', 'rt'), delimiter=';')
+count = 0.0
+lines = 0.0
 
-for i, line in enumerate(input_file):
-        print('datasets/' + str(line))
-#        chal_img = cv2.imread('datasets/' + str(line))
-	chal_img = cv2.imread('datasets/facesInTheWild/Rose_Linkins_0001.jpg')
-        resized_image = cv2.resize(chal_img, (WIDTH, HEIGHT)).astype(np.float32)
-        resized_image = np.expand_dims(resized_image, axis=0)
-        out = loaded_model.predict(resized_image)
-        best_guess = np.argmax(out)
-        print(a_array[best_guess], i)
-input_file.close()
+for line in input_file:
+    name = 'datasets/facesInTheWild/%s' % str(line[0]).replace('\n', '').replace('\r', '')
+
+    chal_img = cv2.imread(name)
+    chal_img = Utils.cropToFace(chal_img)
+    resized_image = cv2.resize(chal_img, (WIDTH, HEIGHT)).astype(np.float32)
+    resized_image = np.expand_dims(resized_image, axis=0)
+    out = loaded_model.predict(resized_image)
+    best_guess = np.argmax(out)
+
+
+    lines += 1.0
+    if a_array[best_guess] == str(line[1]).replace('\n', '').replace('\r', '').replace(' ', ''):
+        count += 1.0
+    else:
+        print(line[0] + ': PRED: ' + a_array[best_guess] + ' REAL: ' + line[1])
+
+print('accuracy : ' + str(((count / lines) * 100.0)))

@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
 from keras import backend as K
+from keras import optimizers
 from keras.layers import Input, Dense, Flatten, Activation, Dropout, Reshape
 from keras.layers import Conv2D, MaxPooling2D, AveragePooling2D, merge
-from keras.callbacks import TensorBoard, EarlyStopping
+from keras.callbacks import TensorBoard, EarlyStopping, ModelCheckpoint
 import keras.metrics
 from keras.models import Sequential, Model
 from keras.utils import np_utils
@@ -14,9 +15,13 @@ import cv2
 from PIL import Image
 import tensorflow as tf
 import csv
+import sys
 
-WIDTH = 250
-HEIGHT = 250
+sys.path.insert(0, 'src/classifiers/')
+import Utils
+
+WIDTH = 90
+HEIGHT = 100
 CHANNEL = 3
 
 # Optional - this will set so we can release GPU memory after computation
@@ -40,24 +45,69 @@ def one_hot_encode(label):
     return np_utils.to_categorical(np.int32(categories(label)), 2)
 
 
-def load_images(path, lfw_attributes, train_ratio):
+def load_images(path, data, ind_gender, train_ratio):
     datas = []
     labels = []
+    val_data = []
+    val_label = []
     images_path = path + '/facesInTheWild/'
+    MAX_COUNT = 3000
+    count = 0
+    previous_name = ''
+    same_instance = 0
 
     # IMAGES PER INDIVIDUAL
-    for i, line in enumerate(lfw_attributes):
-        name = line[0]
-        if i > 1000:
-            break;
-        gender = 'MALE' if float(line[2]) > 0 else 'FEMALE'
-        for image_number in range(1, line[1]):
-            img = Image.open(images_path + str(name).replace(' ', '_') + '_' + str(image_number).zfill(4) + '.jpg')
-            data = img.resize([WIDTH, HEIGHT])
-            data = np.multiply(data, 1 / 255.0)
-            data = np.asarray(data)
-            datas.append(data)
-            labels.append(one_hot_encode(gender))
+    for i, name in enumerate(data):
+        if count >= MAX_COUNT:
+            break
+
+        # for image_number in range(1, 1):
+        img = cv2.imread(images_path + str(name), 3)
+        img = Utils.cropToFace(img)
+        img = cv2.resize(img, (WIDTH, HEIGHT))
+        img = np.multiply(img, 1 / 255.0)
+        img = np.asarray(img)
+
+        if name == previous_name:
+            same_instance += 1
+
+            if same_instance == 1:
+                continue
+        else:
+            count += 1
+            same_instance = 0
+
+        datas.append(img)
+        labels.append(one_hot_encode(ind_gender[i]))
+        previous_name = name
+    count  = 0
+    previous_name = ''
+
+    for i, name in reversed(list(enumerate(data))):
+        if count >= MAX_COUNT:
+            break
+
+        # for image_number in range(1, 1):
+        img = cv2.imread(images_path + str(name), 3)
+        img = Utils.cropToFace(img)
+        img = cv2.resize(img, (WIDTH, HEIGHT))
+        img = np.multiply(img, 1 / 255.0)
+        img = np.asarray(img)
+
+        if name == previous_name:
+            same_instance += 1
+
+            if same_instance == 1:
+                continue
+        else:
+            count += 1
+            same_instance = 0
+
+        datas.append(img)
+        labels.append(one_hot_encode(ind_gender[i]))
+        
+        previous_name = name
+
     datas_labels = list(zip(datas, labels))
     random.shuffle(datas_labels)
     (datas, labels) = list(zip(*datas_labels))
@@ -68,25 +118,21 @@ def load_images(path, lfw_attributes, train_ratio):
     test_datas = np.stack(datas[train_size: size])
     test_labels = np.stack(labels[train_size: size])
 
-    return (train_datas, train_labels, test_datas, test_labels)
+    return train_datas, train_labels, test_datas, test_labels, val_data, val_label
 
 
 def get_cnn_net():
     inputs = Input(shape=(HEIGHT, WIDTH, CHANNEL))
 
     model = Sequential()
-    model.add(Conv2D(32, (5, 5), border_mode='valid', input_shape=(HEIGHT, WIDTH, CHANNEL)))
+    model.add(Conv2D(32, (5, 5), border_mode='valid', kernel_initializer='glorot_uniform', bias_initializer='zeros', input_shape=(HEIGHT, WIDTH, CHANNEL)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.5))
+    model.add(Dropout(0.6))
     model.add(Conv2D(32, (3, 3)))
     model.add(Activation('relu'))
-    model.add(AveragePooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.15))
-    model.add(Conv2D(32, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(AveragePooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.15))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.2))
     model.add(Flatten())
 
     x = model(inputs)
@@ -95,40 +141,36 @@ def get_cnn_net():
     x = Reshape((1, 2))(x1)
     model = Model(input=inputs, output=x)
 
-    # Visualize model
-    plot_model(model, show_shapes=True, to_file='captcha6_20k_orig_graph.png')
-    model.compile(loss='categorical_crossentropy', loss_weights=[1.], optimizer='Adam', metrics=['accuracy'])
+    model.compile(loss='binary_crossentropy', loss_weights=[1.], optimizer='adam', metrics=['accuracy'])
 
     return model
 
 
 def load_csv(filename):
-    lines = csv.reader(open(filename, 'rt'), delimiter='\t')
+    lines = csv.reader(open(filename, 'rt'), delimiter=';')
     dataset = []
+    labels = []
     for i, row in enumerate(lines):
-        if i != 0:
-            line = []
-            for j, value in enumerate(row):
-                column_value = int(value) if value.isdigit() else value
-                line.append(column_value)
-
-            if len(line) > 0:
-                dataset.append(line)
-    return dataset
+        dataset.append(str(row[0]))
+        labels.append(str(row[1]).replace(' ', ''))
+    return dataset, labels
 
 
-lfw_attributes = load_csv('datasets/lfw_attributes.txt')
-(train_datas, train_labels, test_datas, test_labels) = load_images('datasets', lfw_attributes, 0.8)
+dataset, labels = load_csv('src/preprocessing/all_labels_old.txt')
+(train_datas, train_labels, test_datas, test_labels, val_datas, val_labels) = load_images('datasets', dataset, labels, 0.8)
 model = get_cnn_net()
-print(model)
-model.fit(train_datas, train_labels, epochs=32, batch_size=32, verbose=1, callbacks=[tensorboard])
-predict_labels = model.predict(test_datas, batch_size=32)
+
+checkpoint = ModelCheckpoint('captcha6_20k_orig_model.h5', monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+es= keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=2, verbose=1, mode='auto')
+model.fit(train_datas, train_labels, epochs=32, batch_size=32, verbose=1,
+          callbacks=[tensorboard, es, checkpoint], validation_split=0.2, shuffle=True)
+predict_labels = model.predict(test_datas, batch_size=128)
 test_size = len(test_labels)
 y1 = test_labels[:, 0, :].argmax(1) == predict_labels[:, 0, :].argmax(1)
 acc = (y1).sum() * 1.0
 
-print('\nmodel evaluate:\nacc:', acc / test_size)
-print('y1', (y1.sum()) * 1.0 / test_size)
+print('\nmodel evaluate:\nacc: ', acc / test_size)
+print('y1 ', (y1.sum()) * 1.0 / test_size)
 
 # Save model and weights for trained model
 model.save_weights('captcha6_20k_orig_model.h5')
