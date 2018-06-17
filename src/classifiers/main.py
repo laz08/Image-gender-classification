@@ -8,8 +8,8 @@ import time
 import Utils
 import ClassifierManager as cm
 
-PERFORM_KNN = False
-PERFORM_SVM = False
+PERFORM_KNN = True
+PERFORM_SVM = True
 PERFORM_MLP = False
 PERFORM_RAND_FOREST = False
 
@@ -43,7 +43,7 @@ def main(argv):
 
 
     #############################################
-    imagesNumberPerGender = 3000    # If the num. of images is greater than the maximum of them, then it reads all of them
+    imagesNumberPerGender = 3000   # If the num. of images is greater than the maximum of them, then it reads all of them
     print("[2] Forcing gender parity up to {} images per gender".format(imagesNumberPerGender))
     mat = Utils.forceGenderParityUpToN(mat, imagesNumberPerGender)
     #############################################

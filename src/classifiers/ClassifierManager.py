@@ -7,6 +7,8 @@ import Constants as const
 import classifiers.KNearestNeighbors as Knn
 import classifiers.SVM as SVM
 import classifiers.MLP as MLP
+from sklearn.metrics import log_loss
+from math import exp
 
 
 ##--------------------------------------------------------------
@@ -48,7 +50,7 @@ def computeAccuracy(realData, predictions):
 	print("    [*] Female predicted {}".format(femalePredCtr))
 	return okCtr*100/len(realData)
 
-def checkResultsPredicted(test, training, prediction):
+def checkResultsPredicted(test, training, prediction, prediction_prob = None):
 
 	if(const._DEBUG):
 		print(prediction)
@@ -72,21 +74,30 @@ def checkResultsPredicted(test, training, prediction):
 	print("\n    ==== METRICS ====")
 	print("    [*] Accuracy: {}".format(round(accuracy, 4)))
 	print("    [*] Precision: {}".format(round(precision, 4)))
-	print("    [*] Recall: {} \n".format(round(recall, 4)))
+	print("    [*] Recall: {}".format(round(recall, 4)))
+
+	if (prediction_prob is not None):
+		loss = log_loss([item[1] for item in test], prediction_prob)
+		prob = exp(-loss)
+		print("    [*] Log loss: {}".format(round(loss, 4)))
+		print("    [*] Total prob: {}\n".format(round(prob, 4)))
+	else:
+		print("\n")
 	#fpr, tpr, thresholds = roc_curve(realLabels, prediction, pos_label=2)
 	#metrics.auc(fpr, tpr)
 	return acc
 
 def performLinearSVC(training, test, mat):
 
-	prediction = SVM.performSVM(training, test, mat)
-	return checkResultsPredicted(test, training, prediction)
+	prediction, prediction_prob = SVM.performSVM(training, test, mat)
+	#cross_val_score(clf, X, y, scoring='neg_log_loss')
+	return checkResultsPredicted(test, training, prediction, prediction_prob)
 
 
 def performKNeighbors(training, test, k):
 
-	prediction = Knn.performKNN(training, test, k)
-	return checkResultsPredicted(test, training, prediction)
+	prediction, prediction_prob = Knn.performKNN(training, test, k)
+	return checkResultsPredicted(test, training, prediction, prediction_prob)
 
 
 def performMLPClassifier(training, test):
