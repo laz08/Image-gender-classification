@@ -9,9 +9,12 @@ import Utils
 import ClassifierManager as cm
 
 PERFORM_KNN = True
-PERFORM_SVM = True
+PERFORM_SVM = False
 PERFORM_MLP = False
 PERFORM_RAND_FOREST = False
+
+PERFORM_CROSS_KNN = True
+PERFORM_CROSS_SVM = False
 
 
 def usage():
@@ -71,7 +74,7 @@ def main(argv):
         print("[5] Method chosen: SVM")
         startTime = time.time()
 
-        acc = cm.performLinearSVC(training, test, mat)
+        acc = cm.performLinearSVC(training, test)
         #print("SVM accuracy: {}%".format(acc))
 
         endTime = time.time()
@@ -99,8 +102,28 @@ def main(argv):
 
         endTime = time.time()
         elapsedTime = endTime - startTime
-        print("Elapsed time: {}".format(timeAsStr))
-    
+        #print("Elapsed time: {}".format(timeAsStr))
+
+    if PERFORM_CROSS_SVM:
+
+        print("[5] Method chosen: SVM WITH CROSSVALIDATION")
+        startTime = time.time()
+        acc = cm.performCrossvalidationSVM(mat)
+        endTime = time.time()
+
+        elapsedTime = endTime - startTime
+        print("Elapsed time: {} s".format(round(elapsedTime, 4)))
+
+    if PERFORM_CROSS_KNN:
+
+        print("[5] Method chosen: KNN WITH CROSSVALIDATION")
+        startTime = time.time()
+        acc = cm.performCrossvalidationKNN(mat, 7)
+        endTime = time.time()
+
+        elapsedTime = endTime - startTime
+        print("Elapsed time: {} s".format(round(elapsedTime, 4)))
+
    
 if __name__ == "__main__":
     main(sys.argv[1:])

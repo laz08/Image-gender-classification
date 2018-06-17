@@ -55,10 +55,11 @@ def checkResultsPredicted(test, training, prediction, prediction_prob = None):
 	if(const._DEBUG):
 		print(prediction)
 	numPred = len(prediction)
+	numPredProb = len(prediction_prob)
 	numReal = len(test)
 	numTrain = len(training)
 	if(const._DEBUG):
-		print("Length " + str(numPred) + " - " + str(numReal) + " - " + str(numTrain))
+		print("Length " + str(numPred) + " - " + str(prediction_prob)+ " - " + str(numReal) + " - " + str(numTrain))
 
 	acc = computeAccuracy(test, prediction)
 	if(const._DEBUG):
@@ -87,9 +88,20 @@ def checkResultsPredicted(test, training, prediction, prediction_prob = None):
 	#metrics.auc(fpr, tpr)
 	return acc
 
-def performLinearSVC(training, test, mat):
+def checkResultsCrossvalidation(scores):
+	if(const._DEBUG):
+		print(scores)
 
-	prediction, prediction_prob = SVM.performSVM(training, test, mat)
+	mean = scores.mean()
+	std = scores.std()
+	print("\n    ==== METRICS ====")
+	print("    [*] Mean neg log loss: %0.2f (+/- %0.2f) \n" % (mean, std / 2))
+	return mean
+
+
+def performLinearSVC(training, test):
+
+	prediction, prediction_prob = SVM.performSVM(training, test)
 	#cross_val_score(clf, X, y, scoring='neg_log_loss')
 	return checkResultsPredicted(test, training, prediction, prediction_prob)
 
@@ -114,6 +126,21 @@ def performDecisionTreeClassifier(training, test):
 	prediction = model.predict([item[2] for item in test])
 
 	return checkResultsPredicted(test, training, prediction)
+
+
+def performCrossvalidationSVM(mat):
+
+	scores = SVM.performCrossValidationSVM(mat)
+
+	return checkResultsCrossvalidation(scores)
+
+
+def performCrossvalidationKNN(mat, k):
+
+	scores = Knn.performCrossValidationKNN(mat, k)
+
+	return checkResultsCrossvalidation(scores)
+
 
 
 
