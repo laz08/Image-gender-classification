@@ -29,7 +29,7 @@ def performCrossValidationSVM(mat, C=10000):
     tol=0.001, verbose=False)
 
     cv = KFold(n_splits=10)
-    print("K value: " + str(cv))
+    print("C value: " + str(C) + " " + str(cv))
 
     scoring = ['accuracy', 'neg_log_loss']
     scores = cross_validate(model, [item[2] for item in mat], [item[1] for item in mat], scoring=scoring, cv=cv, return_train_score=True)
