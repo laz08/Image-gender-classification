@@ -88,7 +88,7 @@ def checkResultsPredicted(test, training, prediction, prediction_prob = None):
 	#metrics.auc(fpr, tpr)
 	return acc
 
-def checkResultsCrossvalidation(scores,  acc = None, recall = None, prec = None):
+def checkResultsCrossvalidation(scores):
 	if(const._DEBUG):
 		print(scores.keys())
 		print(scores)
@@ -157,15 +157,13 @@ def performDecisionTreeClassifier(training, test):
 def performCrossvalidationSVM(mat):
 
 	scores = SVM.performCrossValidationSVM(mat)
-
 	return checkResultsCrossvalidation(scores)
 
 
 def performCrossvalidationKNN(mat, k):
 
-	scores, acc, recall, prec = Knn.performCrossValidationKNN(mat, k)
-
-	return checkResultsCrossvalidation(scores, acc, recall, prec)
+	scores = Knn.performCrossValidationKNN(mat, k)
+	return checkResultsCrossvalidation(scores)
 
 
 

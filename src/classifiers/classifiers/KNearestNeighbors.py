@@ -34,4 +34,4 @@ def performCrossValidationKNN(mat, k):
     scoring = ['accuracy', 'neg_log_loss']
     scores = cross_validate(model, [item[2] for item in mat], [item[1] for item in mat], scoring=scoring, cv=cv, return_train_score=True)
 
-    return scores, accuracy, recall, prec
+    return scores
