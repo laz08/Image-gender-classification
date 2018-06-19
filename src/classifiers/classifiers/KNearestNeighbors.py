@@ -24,8 +24,11 @@ def performCrossValidationKNN(mat, k):
 
     #pipeline = Pipeline([('transformer', scalar), ('estimator', clf)])
 
-    cv = KFold(n_splits=40)
+    cv = KFold(n_splits=10)
     #print("K value: " + str(cv))
     scores = cross_val_score(model, [item[2] for item in mat], [item[1] for item in mat], cv=cv,  scoring='neg_log_loss')
+    accuracy = cross_val_score(model, [item[2] for item in mat], [item[1] for item in mat], cv=cv,  scoring='accuracy')
+    recall = cross_val_score(model, [item[2] for item in mat], [item[1] for item in mat], cv=cv,  scoring='recall')
+    prec = cross_val_score(model, [item[2] for item in mat], [item[1] for item in mat], cv=cv,  scoring='precision')
 
-    return scores
+    return scores, accuracy, recall, prec

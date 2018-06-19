@@ -88,14 +88,18 @@ def checkResultsPredicted(test, training, prediction, prediction_prob = None):
 	#metrics.auc(fpr, tpr)
 	return acc
 
-def checkResultsCrossvalidation(scores):
+def checkResultsCrossvalidation(scores,  acc = None, recall = None, prec = None):
 	if(const._DEBUG):
 		print(scores)
 
 	mean = scores.mean()
 	std = scores.std()
+	
+
 	print("\n    ==== METRICS ====")
 	print("    [*] Mean neg log loss: %0.2f (+/- %0.2f) \n" % (mean, std / 2))
+	if(acc is not None):
+		print("    [*] Accuracy: %0.2f (+/- %0.2f) \n" % (acc.mean(), acc.std() / 2))
 	return mean
 
 
@@ -108,6 +112,7 @@ def performLinearSVC(training, test):
 
 def performKNeighbors(training, test, k):
 
+	print("Selected K: {}".format(k))
 	prediction, prediction_prob = Knn.performKNN(training, test, k)
 	return checkResultsPredicted(test, training, prediction, prediction_prob)
 
@@ -137,9 +142,9 @@ def performCrossvalidationSVM(mat):
 
 def performCrossvalidationKNN(mat, k):
 
-	scores = Knn.performCrossValidationKNN(mat, k)
+	scores, acc, recall, prec = Knn.performCrossValidationKNN(mat, k)
 
-	return checkResultsCrossvalidation(scores)
+	return checkResultsCrossvalidation(scores, acc, recall, prec)
 
 
 
