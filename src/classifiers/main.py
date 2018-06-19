@@ -8,7 +8,7 @@ import time
 import Utils
 import ClassifierManager as cm
 
-PERFORM_KNN = True
+PERFORM_KNN = False
 PERFORM_SVM = False
 PERFORM_MLP = False
 PERFORM_RAND_FOREST = False
