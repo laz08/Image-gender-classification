@@ -11,8 +11,8 @@ import ClassifierManager as cm
 PERFORM_KNN = False
 PERFORM_SVM = False
 PERFORM_MLP = False
-PERFORM_CROSS_KNN = True
-PERFORM_CROSS_SVM = False
+PERFORM_CROSS_KNN = False
+PERFORM_CROSS_SVM = True
 
 
 def usage():
@@ -101,7 +101,7 @@ def main(argv):
         accuracyStdArray = []
         negLossArray = []
         
-        diffC = [10000]
+        diffC = [1, 10, 50, 100, 200, 500, 1000, 10000]
         for c in diffC:
             acc, accStd, negLoss, negLossStd  = cm.performCrossvalidationSVM(mat, c)
             accuracyArray.append(acc)
