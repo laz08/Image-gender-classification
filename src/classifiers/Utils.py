@@ -147,10 +147,7 @@ def forceGenderParityUpToN(mat, N):
 def readImages(mat):
 
     numPoints = 24
-    rad = 8
-
-    numPoints = 16
-    rad = 2
+    rad = 3
     print("[*] Extracting features using LBP, {} points, radius {}".format(numPoints, rad))
 
     imgNotRead = []

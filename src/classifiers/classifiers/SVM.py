@@ -21,7 +21,7 @@ def performSVM(training, test):
 
     return prediction, prediction_prob
 
-def performCrossValidationSVM(mat):
+def performCrossValidationSVM(mat, C=10000):
 
     model = SVC(C=10000.0, cache_size=200, class_weight=None, coef0=0.0,
     decision_function_shape='ovr', degree=1, gamma='auto', kernel='poly',

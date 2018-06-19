@@ -8,11 +8,9 @@ import time
 import Utils
 import ClassifierManager as cm
 
-PERFORM_KNN = True
+PERFORM_KNN = False
 PERFORM_SVM = False
 PERFORM_MLP = False
-PERFORM_RAND_FOREST = False
-
 PERFORM_CROSS_KNN = True
 PERFORM_CROSS_SVM = False
 
@@ -62,7 +60,7 @@ def main(argv):
         print("[5] Method chosen: KNN")
         startTime = time.time()
 
-        k = 21    
+        k = 7    
         cm.performKNeighbors(training, test, k)
 
         endTime = time.time()
@@ -93,22 +91,34 @@ def main(argv):
         elapsedTime = endTime - startTime
         print("Elapsed time: {} s".format(round(elapsedTime, 4)))
 
-    if PERFORM_RAND_FOREST:
-
-        startTime = time.time()
-
-        acc = cm.performDecisionTreeClassifier(training, test)
-        print("Rand. forest accuracy: {}%".format(acc))
-
-        endTime = time.time()
-        elapsedTime = endTime - startTime
-        #print("Elapsed time: {}".format(timeAsStr))
 
     if PERFORM_CROSS_SVM:
 
         print("[5] Method chosen: SVM WITH CROSSVALIDATION")
         startTime = time.time()
-        acc = cm.performCrossvalidationSVM(mat)
+        
+        accuracyArray = []
+        accuracyStdArray = []
+        negLossArray = []
+        
+        diffC = [10000]
+        for c in diffC:
+            acc, accStd, negLoss, negLossStd  = cm.performCrossvalidationSVM(mat, c)
+            accuracyArray.append(acc)
+            accuracyStdArray.append(accStd)
+            negLossArray.append(negLoss)
+
+        fileTime = time.time()
+        fileName = "SVM_Results_" + str(fileTime) + ".csv"
+        Utils.appendLineToFile(fileName, "C ; Accuracy ; Accuracy Std; Log Loss;")
+        for c, val in enumerate(diffC):
+            Utils.appendLineToFile(fileName, 
+                str(val) + "; " + \
+                str(round(accuracyArray[c], 4)) + "; " + \
+                str(round(accuracyStdArray[c], 4)) + "; " + \
+                str(round(negLossArray[c], 4)) + "; "
+                )
+
         endTime = time.time()
 
         elapsedTime = endTime - startTime
@@ -118,15 +128,31 @@ def main(argv):
 
         print("[5] Method chosen: KNN WITH CROSSVALIDATION")
         startTime = time.time()
+        
+        accuracyArray = []
+        accuracyStdArray = []
         negLossArray = []
-        diffK = [3, 5, 7, 13, 21, 51, 100]
+        negLossStdArray = []
+
+        diffK = [3, 5, 7, 13, 21, 51, 101]
         for k in diffK:
-            negLoss = cm.performCrossvalidationKNN(mat, k)
+            acc, accStd, negLoss, negLossStd = cm.performCrossvalidationKNN(mat, k)
+            accuracyArray.append(acc)
+            accuracyStdArray.append(accStd)
             negLossArray.append(negLoss)
+            negLossStdArray.append(negLossStdArray)
     
-        Utils.appendLineToFile("KnnNegLoss.csv", "K ; Log Loss")
-        for k, l in enumerate(negLossArray):
-            Utils.appendLineToFile("KnnNegLoss.csv", str(diffK[k]) + "; " + str(l))
+        fileTime = time.time()
+        fileName = "Knn_Results_" + str(fileTime) + ".csv"
+        Utils.appendLineToFile(fileName, "K ; Accuracy ; Accuracy Std; Log Loss;")
+        for k, val in enumerate(diffK):
+            Utils.appendLineToFile(fileName, 
+                str(val) + "; " + \
+                str(round(accuracyArray[k], 4)) + "; " + \
+                str(round(accuracyStdArray[k], 4)) + "; " + \
+                str(round(negLossArray[k], 4)) + "; "
+                )
+                
                 
         endTime = time.time()
         elapsedTime = endTime - startTime

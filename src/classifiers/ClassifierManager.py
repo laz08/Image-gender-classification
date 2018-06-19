@@ -96,6 +96,7 @@ def checkResultsCrossvalidation(scores):
 	test_neg_log_loss = scores['test_neg_log_loss'].mean()
 	test_neg_log_loss_std = scores['test_neg_log_loss'].std()
 	test_accuracy = scores['test_accuracy'].mean()
+	test_accuracy_std = scores['test_accuracy'].std()
 	train_neg_log_loss = scores['train_neg_log_loss'].mean()
 	train_neg_log_loss_std = scores['train_neg_log_loss'].std()
 	train_accuracy = scores['train_accuracy'].mean()
@@ -120,7 +121,7 @@ def checkResultsCrossvalidation(scores):
 	#print("    [*] Mean Precision: {}".format(round(scores['test_rec'], 4)))
 	#print("    [*] Mean Recall: {}".format(round(scores['test_prec'], 4)))
 	#print("    [*] Mean Neg Log Loss: %0.2f (+/- %0.2f) \n" % (mean_loss, std_loss / 2))
-	return test_accuracy
+	return test_accuracy, test_accuracy_std, test_neg_log_loss, test_neg_log_loss_std
 
 
 
@@ -144,19 +145,9 @@ def performMLPClassifier(training, test):
 	return checkResultsPredicted(test, training, prediction)
 
 
-def performDecisionTreeClassifier(training, test):
-   
-	model = DecisionTreeClassifier()
-	model.fit([item[2] for item in training], [item[1] for item in training])
+def performCrossvalidationSVM(mat, c):
 
-	prediction = model.predict([item[2] for item in test])
-
-	return checkResultsPredicted(test, training, prediction)
-
-
-def performCrossvalidationSVM(mat):
-
-	scores = SVM.performCrossValidationSVM(mat)
+	scores = SVM.performCrossValidationSVM(mat, c)
 	return checkResultsCrossvalidation(scores)
 
 
