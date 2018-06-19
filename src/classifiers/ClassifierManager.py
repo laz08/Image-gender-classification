@@ -90,13 +90,37 @@ def checkResultsPredicted(test, training, prediction, prediction_prob = None):
 
 def checkResultsCrossvalidation(scores):
 	if(const._DEBUG):
+		print(scores.keys())
 		print(scores)
 
-	mean = scores.mean()
-	std = scores.std()
+	test_neg_log_loss = scores['test_neg_log_loss'].mean()
+	test_neg_log_loss_std = scores['test_neg_log_loss'].std()
+	test_accuracy = scores['test_accuracy'].mean()
+	train_neg_log_loss = scores['train_neg_log_loss'].mean()
+	train_neg_log_loss_std = scores['train_neg_log_loss'].std()
+	train_accuracy = scores['train_accuracy'].mean()
+	fit_time = scores['fit_time'].mean()
+	fit_time_std = scores['fit_time'].std()
+	score_time = scores['score_time'].mean()
+	score_time_std = scores['score_time'].std()
+
 	print("\n    ==== METRICS ====")
-	print("    [*] Mean neg log loss: %0.2f (+/- %0.2f) \n" % (mean, std / 2))
-	return mean
+	print("    [*] Fit time: %0.2f (+/- %0.2f) " % (fit_time, fit_time_std / 2))
+	print("    [*] Training - Neg log loss: %0.2f (+/- %0.2f) " % (train_neg_log_loss, train_neg_log_loss_std / 2))
+	print("    [*] Training - Accuracy: %0.2f" % (train_accuracy))
+	print("    [*] Score time: %0.2f (+/- %0.2f) " % (score_time, score_time_std / 2))
+	print("    [*] Test - Neg log loss: %0.2f (+/- %0.2f) " % (test_neg_log_loss, test_neg_log_loss_std / 2))
+	print("    [*] Test - Accuracy: %0.2f \n" % (test_accuracy))
+
+	#mean_loss = scores['test_loss'].mean()
+	#std_loss = scores['test_loss'].std()
+
+	#print("\n    ==== METRICS ====")
+	#print("    [*] Mean Accuracy: {}".format(round(scores['test_acc'].mean(), 4)))
+	#print("    [*] Mean Precision: {}".format(round(scores['test_rec'], 4)))
+	#print("    [*] Mean Recall: {}".format(round(scores['test_prec'], 4)))
+	#print("    [*] Mean Neg Log Loss: %0.2f (+/- %0.2f) \n" % (mean_loss, std_loss / 2))
+	return test_accuracy
 
 
 def performLinearSVC(training, test):

@@ -8,13 +8,13 @@ import time
 import Utils
 import ClassifierManager as cm
 
-PERFORM_KNN = True
+PERFORM_KNN = False
 PERFORM_SVM = False
 PERFORM_MLP = False
 PERFORM_RAND_FOREST = False
 
 PERFORM_CROSS_KNN = True
-PERFORM_CROSS_SVM = False
+PERFORM_CROSS_SVM = True
 
 
 def usage():
