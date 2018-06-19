@@ -26,7 +26,7 @@ def performSVM(training, test):
 
 def performCrossValidationSVM(mat, C=10000):
 
-    model = SVC(C=10000.0, cache_size=200, class_weight=None, coef0=0.0,
+    model = SVC(C=C, cache_size=200, class_weight=None, coef0=0.0,
     decision_function_shape='ovr', degree=1, gamma='auto', kernel='poly',
     max_iter=-1, probability=True, random_state=42, shrinking=True,
     tol=0.001, verbose=False)
