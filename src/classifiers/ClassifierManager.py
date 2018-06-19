@@ -123,6 +123,7 @@ def checkResultsCrossvalidation(scores):
 	return test_accuracy
 
 
+
 def performLinearSVC(training, test):
 
 	prediction, prediction_prob = SVM.performSVM(training, test)
@@ -132,6 +133,7 @@ def performLinearSVC(training, test):
 
 def performKNeighbors(training, test, k):
 
+	print("Selected K: {}".format(k))
 	prediction, prediction_prob = Knn.performKNN(training, test, k)
 	return checkResultsPredicted(test, training, prediction, prediction_prob)
 
@@ -155,14 +157,12 @@ def performDecisionTreeClassifier(training, test):
 def performCrossvalidationSVM(mat):
 
 	scores = SVM.performCrossValidationSVM(mat)
-
 	return checkResultsCrossvalidation(scores)
 
 
 def performCrossvalidationKNN(mat, k):
 
 	scores = Knn.performCrossValidationKNN(mat, k)
-
 	return checkResultsCrossvalidation(scores)
 
 

@@ -8,13 +8,13 @@ import time
 import Utils
 import ClassifierManager as cm
 
-PERFORM_KNN = False
+PERFORM_KNN = True
 PERFORM_SVM = False
 PERFORM_MLP = False
 PERFORM_RAND_FOREST = False
 
 PERFORM_CROSS_KNN = True
-PERFORM_CROSS_SVM = True
+PERFORM_CROSS_SVM = False
 
 
 def usage():
@@ -55,15 +55,15 @@ def main(argv):
     mat = Utils.readImages(mat)
 
     print("[4] Splitting on training/test set...")
-    training, test = Utils.splitTrainingTestSet(mat, 0.8, False)
+    training, test = Utils.splitTrainingTestSet(mat, 0.8, True)
 
     if PERFORM_KNN:
 
         print("[5] Method chosen: KNN")
         startTime = time.time()
 
-        acc = cm.performKNeighbors(training, test, 7)
-        #print("Accuracy with Knn: {}%".format(acc))
+        k = 21    
+        cm.performKNeighbors(training, test, k)
 
         endTime = time.time()
         elapsedTime = endTime - startTime
@@ -118,9 +118,17 @@ def main(argv):
 
         print("[5] Method chosen: KNN WITH CROSSVALIDATION")
         startTime = time.time()
-        acc = cm.performCrossvalidationKNN(mat, 7)
+        negLossArray = []
+        diffK = [3, 5, 7, 13, 21, 51, 100]
+        for k in diffK:
+            negLoss = cm.performCrossvalidationKNN(mat, k)
+            negLossArray.append(negLoss)
+    
+        Utils.appendLineToFile("KnnNegLoss.csv", "K ; Log Loss")
+        for k, l in enumerate(negLossArray):
+            Utils.appendLineToFile("KnnNegLoss.csv", str(diffK[k]) + "; " + str(l))
+                
         endTime = time.time()
-
         elapsedTime = endTime - startTime
         print("Elapsed time: {} s".format(round(elapsedTime, 4)))
 
