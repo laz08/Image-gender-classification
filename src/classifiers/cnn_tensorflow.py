@@ -139,7 +139,7 @@ dataset, labels = load_csv('src/preprocessing/merged_labels.txt')
 (train_datas, train_labels, test_datas, test_labels, val_datas, val_labels) = load_images('datasets', dataset, labels, 0.8)
 model = get_cnn_net()
 
-checkpoint = ModelCheckpoint('captcha6_20k_orig_model.h5', monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+checkpoint = ModelCheckpoint('tensorflow_model_weights.h5', monitor='val_loss', verbose=1, save_best_only=True, mode='min')
 es = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=2, verbose=1, mode='auto')
 hist = model.fit(train_datas, train_labels, epochs=100, batch_size=32, verbose=1,
           callbacks=[tensorboard, es, checkpoint], validation_split=0.1, shuffle=True)
@@ -162,7 +162,7 @@ plt.show()
 
 # Save model and weights for trained model
 # model.save_weights('captcha6_20k_orig_model.h5')
-with open('captcha6_20k_orig_model.json', 'w') as f:
+with open('tensorflow_model_weights.json', 'w') as f:
     f.write(model.to_json())
 
 K.clear_session()
