@@ -13,6 +13,7 @@ import sys
 
 sys.path.insert(0, 'src/classifiers/')
 import Utils
+from skimage import feature
 
 WIDTH = 90 # 180 for captcha6_level2/4
 HEIGHT = 100
@@ -44,10 +45,13 @@ lines = 0.0
 for line in input_file:
     name = 'datasets/facesInTheWild/%s' % str(line[0]).replace('\n', '').replace('\r', '')
 
-    chal_img = cv2.imread(name)
-    chal_img = Utils.cropToFace(chal_img)
-    resized_image = cv2.resize(chal_img, (WIDTH, HEIGHT)).astype(np.float32)
-    resized_image = np.expand_dims(resized_image, axis=0)
+    img = cv2.imread(name, 0)
+    img = Utils.cropToFace(img)
+    feat = feature.local_binary_pattern(img, 24, 3, method="default")
+    img = np.resize(feat.astype('uint8'), (HEIGHT, WIDTH, 3))
+    img = np.multiply(img, 1 / 255.0)
+    chal_img = np.asarray(img)
+    resized_image = np.expand_dims(chal_img, axis=0)
     out = loaded_model.predict(resized_image)
     best_guess = np.argmax(out)
 

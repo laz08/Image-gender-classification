@@ -13,10 +13,8 @@ def performKNN(training, test, k):
     model = KNeighborsClassifier(k)
     model.fit([item[2] for item in training], [item[1] for item in training])
 
-    #acc = model.score([item[2] for item in test], [item[1] for item in test])
-
     prediction_prob = model.predict_proba([item[2] for item in test])
-    #print("prediction " + str(prediction_prob))
+
     prediction = model.predict([item[2] for item in test])
     plt.scatter([item[1] for item in test], prediction)
     return prediction, prediction_prob
@@ -24,8 +22,6 @@ def performKNN(training, test, k):
 def performCrossValidationKNN(mat, k):
 
     model = KNeighborsClassifier(k)
-
-    #pipeline = Pipeline([('transformer', scalar), ('estimator', clf)])
 
     cv = KFold(n_splits=10)
 
