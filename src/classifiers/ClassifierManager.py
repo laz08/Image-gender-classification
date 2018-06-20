@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-from sklearn import metrics
-from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
+from sklearn.metrics import confusion_matrix
 import Constants as const
 import classifiers.KNearestNeighbors as Knn
 import classifiers.SVM as SVM
@@ -113,14 +112,6 @@ def checkResultsCrossvalidation(scores):
 	print("    [*] Test - Neg log loss: %0.2f (+/- %0.2f) " % (test_neg_log_loss, test_neg_log_loss_std / 2))
 	print("    [*] Test - Accuracy: %0.2f \n" % (test_accuracy))
 
-	#mean_loss = scores['test_loss'].mean()
-	#std_loss = scores['test_loss'].std()
-
-	#print("\n    ==== METRICS ====")
-	#print("    [*] Mean Accuracy: {}".format(round(scores['test_acc'].mean(), 4)))
-	#print("    [*] Mean Precision: {}".format(round(scores['test_rec'], 4)))
-	#print("    [*] Mean Recall: {}".format(round(scores['test_prec'], 4)))
-	#print("    [*] Mean Neg Log Loss: %0.2f (+/- %0.2f) \n" % (mean_loss, std_loss / 2))
 	return test_accuracy, test_accuracy_std, test_neg_log_loss, test_neg_log_loss_std
 
 
@@ -128,7 +119,6 @@ def checkResultsCrossvalidation(scores):
 def performLinearSVC(training, test):
 
 	prediction, prediction_prob = SVM.performSVM(training, test)
-	#cross_val_score(clf, X, y, scoring='neg_log_loss')
 	return checkResultsPredicted(test, training, prediction, prediction_prob)
 
 
