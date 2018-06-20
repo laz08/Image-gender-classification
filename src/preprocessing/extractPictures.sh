@@ -1,7 +1,7 @@
 #!/bin/bash
 
-PATH_PHOTOS="./lfw-deepfunneled"
-PATH_DEST="./facesInTheWild"
+PATH_PHOTOS="/home/nora/git/machine-learning-project/datasets/facesRAW/lfw-deepfunneled"
+PATH_DEST="/home/nora/git/machine-learning-project/datasets/facesInTheWild"
 
 find $PATH_PHOTOS > /tmp/files
 while read var2
@@ -12,9 +12,8 @@ do
 	then
 		nom=`echo "$var2" | awk -F '/' '{print $NF}'`
 		echo $nom
-		#cd "$PATH_PHOTOS/$nom"
 		cp $PATH_PHOTOS/$nom/* $PATH_DEST
 	fi
 done < /tmp/files
-echo "Finished extraction"
+echo "Extraction finished."
 rm /tmp/files
