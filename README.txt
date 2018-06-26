@@ -1,7 +1,7 @@
 - AUTHORS
-		* Laura Cebollero
-		* Carles Garriga
-		* Balbina Virgili
+		* Laura C.
+		* Carles G.
+		* Balbina V.
 
 
 - IMPLEMENTATION
